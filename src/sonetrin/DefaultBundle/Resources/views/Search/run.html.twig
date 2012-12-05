@@ -1,0 +1,36 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+
+<ul class="breadcrumb">
+  <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
+  <li class="active">Run</li>
+</ul>
+
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>{{ 'Run'|trans }}</h1>
+    <p class="lead">The first step is done! Now choose your desired graphs and bars!</p>
+  </div>
+</header>
+<hr />
+
+<table class="table span4">
+    <tr>
+      <td>Query for:</td><td>{{entity.name}}</td>
+    </tr>
+    <tr>
+      <td>Total results:</td>
+      <td>
+          Twitter: {{result_twitter|length}}
+      </td>
+    </tr>   
+    <tr>
+      <td>Since:</td><td>{{entity.startDate|date('Y-m-d')}}</td>
+    </tr>
+    <tr>
+      <td>Until:</td><td>{{entity.endDate|date('Y-m-d')}}</td>
+    </tr>
+    
+
+</table>
+{% endblock %}

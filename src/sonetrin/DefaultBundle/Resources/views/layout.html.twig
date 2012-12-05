@@ -1,0 +1,98 @@
+{% extends 'ToaTwitterBootstrapBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    
+    {% block head_style %}
+        {% stylesheets 
+            '@sonetrinDefaultBundle/Resources/public/css/*' 
+        %}
+            <link rel="stylesheet" href="{{ asset_url }}" media="screen" />
+        {% endstylesheets %}
+    {% endblock head_style  %}
+                                    
+{% endblock %}
+                 
+{% block title %}
+    sonetrin - a social network trend indicator
+{% endblock title%}
+    
+        
+{% block body %}
+    
+ {% block navbar %}
+   <div id="top"></div>    
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                 </button>
+                <a class="brand" href="{{ path('default_index') }}">sonetrin</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li {% if app.request.attributes.get('_route') == 'default_index' %} class="active" {%endif%}><a href="{{ path('default_index') }}">Start</a></li>
+                        <li {% if app.request.attributes.get('_route') == 'search' or app.request.attributes.get('_route') == 'search_run'  %} 
+                            class="active" {%endif%}><a href="{{ path('search') }}">Search</a></li>
+                        <li {% if app.request.attributes.get('_route') == 'keyword_index' %} class="active" {%endif%} class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                              Settings
+                              <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ path('keyword_index') }}">Keywords</a></li>
+                                <li><a href="{{ path('socialnetwork') }}">Social Networks</a></li>
+                                <li><a href="">My Settings</a></li>
+                                <li><a href="">User Administration</a></li>
+                            </ul>
+                        </li>
+                       
+                        <li {% if app.request.attributes.get('_route') == 'default_about' %} class="active" {%endif%}><a href="{{ path('default_about') }}">About</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>       
+    </div>
+    {% endblock navbar %}
+    
+    <div class="container fluid">
+        <h1>
+           {% block headline %}{% endblock headline %}
+        </h1>
+                
+           
+         {%block subhead%}{%endblock subhead%}
+         
+         <div class="content">
+            {%block flash%}
+            
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <div class="notice">
+                    {{ flashMessage }}
+                </div>
+            {% endfor %}
+            
+            {%endblock flash %}
+
+              {% block content %}{% endblock content %}
+        </div>
+ 
+    </div>
+            
+{% endblock body %}
+   
+   
+    {% block javascripts %}
+        {% javascripts 
+            '@sonetrinDefaultBundle/Resources/public/js/*' 
+            '@sonetrinDefaultBundle/Resources/public/js/waypoints/waypoints.min.js' 
+            '@ToaTwitterBootstrapBundle/Resources/public/twitterbootstrap/docs/assets/js/bootstrap.js'
+           %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+    
+    {% endblock javascripts%}
+
+

@@ -1,0 +1,106 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+
+{% block content %}
+
+    <header class="jumbotron subhead" id="overview">
+      <div class="container">
+        <h1>Keywords</h1>
+        <p class="lead">Define Keywords to identify positive and negative associations.</p>
+      </div>
+    </header>
+    <hr />
+
+    <div id="keyword-wrapper">
+        
+        <div class="keywords span5">
+            <table class="keywords-table table table-hover">       
+                <legend>Positive Keywords
+                    <a href="{{path('keyword_add', {'assoc':'1'})}}">
+                        <img src="{{ asset('images/icons/add.png') }}" title="Add Keyword" alt="Add" class="icon" />
+                    </a>
+                    <a href="#">
+                        <img src="{{ asset('images/icons/add_document.png') }}" title="Import List" alt="Add" class="icon" />
+                    </a>
+
+                </legend>
+                    <tr>
+                    {% include 'sonetrinDefaultBundle:Keyword:letter-search.html.twig' with {'association':'pos'} %}
+                    </tr>
+                {% for key,keyword in positiveKeywords %}
+                    <tr>
+                        <td>
+                           <a name="pos-{{keyword.english|lower|slice(0, 1)}}"> </a>
+                            {{keyword.english}}
+                        </td>
+                        <td>
+                            <a href="{{path('keyword_edit',{'id':keyword.id})}}">
+                                <img src="{{ asset('images/icons/edit.png') }}" alt="Edit" class="icon" />
+                            </a>
+                            <a onclick="return confirm('Really delete this keyword?')" href="{{path('keyword_delete',{'id':keyword.id})}}">
+                                <img src="{{ asset('images/icons/delete.png') }}" alt="Delete" title="Delete" class="icon" />
+                            </a>
+                        </td>
+                    </tr>
+                {%else%}
+                    No entry was found.
+                {% endfor %}
+            </table>
+         </div>
+
+        <div class="keywords span5">
+            <table class="keywords-table table table-hover"> 
+                <legend>Negative Keywords
+                     <a href="{{path('keyword_add',{'assoc':'0'})}}">
+                        <img src="{{ asset('images/icons/add.png') }}" title="Add Keyword" alt="Add" class="icon" />
+                    </a>
+                    <a href="#">
+                        <img src="{{ asset('images/icons/add_document.png') }}" title="Import List" alt="Add" class="icon" />
+                    </a>  
+
+                </legend>
+                     <tr>
+                    {% include 'sonetrinDefaultBundle:Keyword:letter-search.html.twig' with {'association':'neg'} %}
+                    </tr> 
+                {% for keyword in negativeKeywords %}
+                    <tr>
+                        <td>
+                            <a name="neg-{{keyword.english|lower|slice(0, 1)}}"></a>
+                              {{keyword.english}}
+                         </td>
+                        <td>
+                            <img src="{{ asset('images/icons/edit.png') }}" alt="Edit" class="icon" />
+                            <a onclick="return confirm('Really delete this keyword?')"  href="{{path('keyword_delete',{'id':keyword.id})}}">
+                             <img src="{{ asset('images/icons/delete.png') }}" title="Delete" alt="Delete" class="icon" />
+                            </a>
+                        </td>
+                    </tr>
+                {%else%}
+                    No entry was found.
+                {% endfor %}
+            </table>
+        </div>
+     </div>
+          <a href="#" class="back-to-top" onclick="goToByScroll('top')">
+            <i class="icon-chevron-up icon-white"></i><br />
+              Back to <br />Top
+          </a>   
+    
+ <script>
+     
+function goToByScroll(id){
+ $('html,body').animate({scrollTop: $("#"+id).offset().top},'slow');
+}
+
+
+$(document).ready(function() 
+{
+	$('.back-to-top').addClass('hidden');
+	$.waypoints.settings.scrollThrottle = 50;
+	$('#keyword-wrapper').waypoint(function(event, direction) 
+        {
+		$('.back-to-top').toggleClass('hidden', direction === "up");
+	});
+});
+
+</script>
+{% endblock content %}

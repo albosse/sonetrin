@@ -1,0 +1,17 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+<div class="hero-unit">
+    <h1>Welcome to Sonetrin - a social network trend indicator</h1>
+    <p>With this	application	you	can	crawl	social	networks	and	find	indicators	for	positive	and
+        negative	moods	towards	all	the	things	you	can	imagine.	Also	check	out	the	new
+        semantic	search!</p>
+    <p>
+        <a class="btn btn-primary btn-large" href="{{path('search')}}">
+            Start Searching
+        </a>
+    </p>
+</div>
+
+{% endblock content %}
+
+

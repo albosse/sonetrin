@@ -1,0 +1,73 @@
+/* 
+    Document   : frontend
+    Created on : 25.10.2012, 10:51:52
+    Author     : Alex
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.content { 
+    padding-top: 50px;
+}
+
+.keywords
+{
+    /*
+   height: 500px;
+   overflow-y: scroll;
+   overflow-x: hidden;
+   */
+}
+
+.icon
+{
+    width: 15px;
+    margin-left:5px;
+}
+
+a.letter {
+    color: black;
+    font-size: 10px;
+}
+
+a.letter:hover {
+     font-size: 16px;
+     text-decoration:none;
+}
+
+a.icon:hover {
+     text-decoration:none;
+}
+
+.notice { text-align: center; padding: 10px; background: #DFF2BF; border: 1px solid; color: #4F8A10; margin-bottom: 10px; }
+
+.back-to-top {
+    position: fixed;
+    right: 30px;
+    bottom: 0px;
+    width: 100px;
+    background: #333;
+    color: #888;
+    display: block;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    color: white;
+}
+
+a.back-to-top:visited
+{
+     text-decoration:none;
+     color: white;
+}
+
+a.back-to-top:hover
+{
+    color: white;
+    text-decoration:none;
+    background: #585858;
+}
