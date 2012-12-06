@@ -201,39 +201,36 @@ class SearchController extends Controller {
      * Search networks for the created query.
      *
      * @Route("/run/{id}", name="search_run", requirements={"id" = "\d+"})
-     * @Template()
      */
     public function runAction($id) {
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
+        $search->removeAllResults();
+
+        $twitterStatus = $this->getTwitterResults($search);
         
-        $tm = new TwitterModule($em,$search);
-        $result_twitter = $tm->findTwitterResults();
-        
-        if($tm->saveResult())
+         //Inform user about status
+        if(true === $twitterStatus)
         {
              $this->get('session')->getFlashBag()->add('notice', 'Your results were saved!');
         }else
         {
-             $this->get('session')->getFlashBag()->add('warning', 'Error: Your results were not saved!');
-        }
+             $this->get('session')->getFlashBag()->add('warning', 'Warning: Twitter results were not saved.');
+        }  
         
-       
-        return array('entity' => $search,
-            'result_twitter' => $result_twitter);
+        //Get new search entity with new results
+        $em->refresh($search);
+        return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
     
-    /**
-     * Results
-     *
-     * @Route("/results/{id}", name="search_results", requirements={"id" = "\d+"})
-     * @Template()
-     */
-    public function resultsAction($id) {
+    private function getTwitterResults($search)
+    {
         $em = $this->getDoctrine()->getManager();
-        $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
+        $tm = new TwitterModule($em,$search);
+        $tm->findTwitterResults();
         
-        return array('entity' => $search);
+        //Inform user about status
+        return $tm->saveResult();
     }
-   
+       
 }

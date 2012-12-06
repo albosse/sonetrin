@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Search
 {
+
     /**
      * @var integer $id
      *
@@ -39,7 +40,7 @@ class Search
      *      )
      */
     private $socialNetwork;
-    
+
     /**
      * @var \DateTime $startDate
      *
@@ -60,19 +61,19 @@ class Search
      * @ORM\Column(name="semantic", type="boolean")
      */
     private $semantic;
-    
-     /**
+
+    /**
      * @var boolean $hashtags
      *
      * @ORM\Column(name="hashtags", type="boolean", nullable=true)
      */
     private $hashtags;
-    
-     /**
-     * @ORM\OneToMany(targetEntity="Result", mappedBy="search", cascade={"remove"})
+
+    /**
+     * @ORM\OneToMany(targetEntity="Result", mappedBy="search", cascade={"remove"}, orphanRemoval=true)
      */
     private $result;
-    
+
     /**
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
@@ -86,7 +87,8 @@ class Search
     /**
      * @ORM\prePersist
      */
-    public function prePersist() {
+    public function prePersist()
+    {
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
     }
@@ -94,11 +96,11 @@ class Search
     /**
      * @ORM\preUpdate
      */
-    public function preUpdate() {
+    public function preUpdate()
+    {
         $this->updatedAt = new \DateTime();
     }
-    
-    
+
     /**
      * Get id
      *
@@ -118,7 +120,7 @@ class Search
     public function setName($name)
     {
         $this->name = $name;
-    
+
         return $this;
     }
 
@@ -141,7 +143,7 @@ class Search
     public function setStartDate($startDate)
     {
         $this->startDate = $startDate;
-    
+
         return $this;
     }
 
@@ -164,7 +166,7 @@ class Search
     public function setEndDate($endDate)
     {
         $this->endDate = $endDate;
-    
+
         return $this;
     }
 
@@ -187,7 +189,7 @@ class Search
     public function setSemantic($semantic)
     {
         $this->semantic = $semantic;
-    
+
         return $this;
     }
 
@@ -200,6 +202,7 @@ class Search
     {
         return $this->semantic;
     }
+
     /**
      * Constructor
      */
@@ -207,7 +210,7 @@ class Search
     {
         $this->socialNetwork = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Add socialNetwork
      *
@@ -217,7 +220,7 @@ class Search
     public function setSocialNetwork(\sonetrin\DefaultBundle\Entity\SocialNetwork $socialNetwork)
     {
         $this->socialNetwork[] = $socialNetwork;
-    
+
         return $this;
     }
 
@@ -250,7 +253,7 @@ class Search
     public function addSocialNetwork(\sonetrin\DefaultBundle\Entity\SocialNetwork $socialNetwork)
     {
         $this->socialNetwork[] = $socialNetwork;
-    
+
         return $this;
     }
 
@@ -263,7 +266,7 @@ class Search
     public function addResult(\sonetrin\DefaultBundle\Entity\Result $result)
     {
         $this->result[] = $result;
-    
+
         return $this;
     }
 
@@ -278,6 +281,19 @@ class Search
     }
 
     /**
+     * Remove all results
+     */
+    public function removeAllResults()
+    {
+        $results = $this->getResult();
+
+        foreach ($results as $result)
+        {
+            $this->removeResult($result);
+        }
+    }
+
+    /**
      * Get result
      *
      * @return Doctrine\Common\Collections\Collection 
@@ -286,11 +302,11 @@ class Search
     {
         return $this->result;
     }
-    
+
     public function hasResult()
     {
         $count = $this->getResult()->count();
-        
+
         return $count > 0 ? true : false;
     }
 
@@ -303,7 +319,7 @@ class Search
     public function setHashtags($hashtags)
     {
         $this->hashtags = $hashtags;
-    
+
         return $this;
     }
 
@@ -327,7 +343,7 @@ class Search
     public function setCreatedAt()
     {
         $this->createdAt = new \DateTime();
-    
+
         return $this;
     }
 
@@ -353,7 +369,7 @@ class Search
     public function setUpdatedAt()
     {
         $this->updatedAt = new \DateTime();
-    
+
         return $this;
     }
 
@@ -366,4 +382,5 @@ class Search
     {
         return $this->updatedAt;
     }
+
 }

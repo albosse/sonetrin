@@ -1,0 +1,55 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+
+<ul class="breadcrumb">
+  <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
+  <li class="active">Results</li>
+</ul>
+
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>{{ 'Results'|trans }}</h1>
+    <p class="lead">The first step is done! Now choose your desired graphs and bars!</p>
+  </div>
+</header>
+<hr />
+
+<table class="table span4">
+    <tr>
+      <td>Query for:</td><td>{{entity.name}}</td>
+    </tr>  
+    <tr>
+      <td>Since:</td><td>{{entity.startDate|date('Y-m-d')}}</td>
+    </tr>
+    <tr>
+      <td>Until:</td><td>{{entity.endDate|date('Y-m-d')}}</td>
+    </tr>
+    <tr>
+      <td>Social Networks:</td>
+      <td>
+          <table class="result-list">
+          {% for result in entity.result %}
+            <tr>
+              <td>{{result.socialNetwork.name}}</td>
+              <td>{{result.entriesCount}}</td>
+              <td>  
+                <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
+                  <i class="icon-eye-open"></i>
+                  {{ 'show'|trans }}
+                </a>
+                <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
+                 <i class="icon-remove-sign"></i>
+                    Remove
+                </a>
+             </td>
+             </tr> 
+           {% else%}
+              No entries found.
+          {% endfor %}
+           </table>
+      </td>
+    </tr> 
+    
+
+</table>
+{% endblock %}

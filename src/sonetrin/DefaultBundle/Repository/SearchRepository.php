@@ -3,6 +3,7 @@
 namespace sonetrin\DefaultBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr;
 
 /**
  * KeywordRepository
@@ -13,7 +14,16 @@ use Doctrine\ORM\EntityRepository;
 class SearchRepository extends EntityRepository
 {
 
-    public function findAllWithResults()
+    public function findAllWithResults($id)
     {
+       $query = $this->createQueryBuilder('s')
+//            ->select('s','r')   
+            ->leftJoin('sonetrinDefaultBundle:Result', 'r', Expr\Join::WITH, 'r.search = s.id')   
+            ->where('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery();
+
+       
+        return $query->getResult();       
     }
 }

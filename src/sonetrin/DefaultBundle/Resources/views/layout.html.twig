@@ -67,11 +67,13 @@
          
          <div class="content">
             {%block flash%}
-            
-            {% for flashMessage in app.session.flashbag.get('notice') %}
-                <div class="notice">
-                    {{ flashMessage }}
-                </div>
+                            
+               {% for type, flashMessages in app.session.flashbag.all() %}
+                {% for flashMessage in flashMessages %}
+                    <div class="{{ type }}">
+                        {{ flashMessage|trans }}
+                    </div>
+                {% endfor %}
             {% endfor %}
             
             {%endblock flash %}

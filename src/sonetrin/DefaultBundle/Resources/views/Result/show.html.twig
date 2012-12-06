@@ -1,0 +1,67 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+
+<ul class="breadcrumb">
+  <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
+  <li><a href="{{path('result',{'search':result.search.id})}}">Results</a> <span class="divider">/</span></li>
+  <li class="active">Show</li>
+</ul>
+
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>{{ 'Show Results'|trans }}</h1>
+    <p class="lead">Take a look inside the saved entries...</p>
+  </div>
+</header>
+<hr />
+
+<p>Displaying entries 1-{{count}} / {{result.getFile|length}}</p>
+<table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
+    <tbody>
+        <tr>
+            <th>Date</th>
+            <th>Message</th>
+        </tr>
+
+        {%for key,entity in result.getFile %}
+        {%if key < count %}
+            <tr>
+                <td>{{ entity.date| date('Y-m-d') }}</td>
+                <td>{{ entity.text }}</td>
+            </tr>
+            {%endif%}
+        {%endfor%}
+        
+        {%if count < result.getFile|length%}
+            <tr>
+                <td colspan="2"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
+            </tr>   
+        {%endif%}
+    </tbody>
+</table>
+
+    <a href="#" class="back-to-top" onclick="goToByScroll('top')">
+      <i class="icon-chevron-up icon-white"></i><br />
+        Back to <br />Top
+    </a>   
+    
+<script>
+     
+function goToByScroll(id){
+ $('html,body').animate({scrollTop: $("#"+id).offset().top},'slow');
+}
+
+
+$(document).ready(function() 
+{
+	$('.back-to-top').addClass('hidden');
+	$.waypoints.settings.scrollThrottle = 50;
+	$('#wrapper').waypoint(function(event, direction) 
+        {
+		$('.back-to-top').toggleClass('hidden', direction === "up");
+	});
+});
+
+</script>
+
+{% endblock %}

@@ -14,10 +14,11 @@ class SearchType extends AbstractType
         $builder
             ->add('name')
             ->add('startDate',null,array(
-                    'years' => range(1970,date('Y',time()))
+                    'years' => range(2000,date('Y',time()))
                 ))
             ->add('endDate',null,array(
-                    'years' => range(1970,date('Y',time()))
+                    'years' => range(2000,date('Y',time())),
+                    'data' => new \DateTime()
                 ))
             ->add('semantic',null,array('required' => false))
             ->add('socialNetwork','entity', array(

@@ -25,6 +25,18 @@
             <th>Semantic</th>
             <td><i class="{{ entity.semantic ? 'icon-check' : '' }}"></i></td>
         </tr>
+        <tr>
+            <th>Results</th>
+            <td>
+                <ul>
+               {%for result in entity.result %}
+                   <li>
+                   {{ result.createdAt|date('Y-m-d') }} | {{ result.socialNetwork.name }} |  {{ result.entriesCount }} entries
+                   </li>
+               {%endfor%}
+                </ul>        
+            </td>
+        </tr>
     </tbody>
 </table>
 

@@ -22,10 +22,11 @@ class Result
      * @param $network The network name
      * @param $file The file to create
      */
-    public function __construct($file) {
+    public function __construct($file)
+    {
         $this->file = $file;
     }
-    
+
     /**
      * @var integer $id
      *
@@ -42,22 +43,29 @@ class Result
      * @Assert\NotBlank
      */
     private $path;
-    
+
     /**
      *  @var integer $search
      * 
      * @ORM\ManyToOne(targetEntity="Search", inversedBy="result")
      */
     private $search;
-       
+
     /**
      * @var integer $socialNetwork
      * 
      * @ORM\ManyToOne(targetEntity="SocialNetwork")
      */
     private $socialNetwork;
-    
-     /**
+
+    /**
+     * @var integer $entriesCount
+     * 
+     * @ORM\Column(name="entriesCount", type="integer")
+     */
+    private $entriesCount;
+
+    /**
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
     protected $createdAt;
@@ -66,8 +74,8 @@ class Result
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     protected $updatedAt;
-    
-     /**
+
+    /**
      *
      * @ORM\PrePersist()
      *
@@ -77,7 +85,7 @@ class Result
     public function setCreatedAt()
     {
         $this->createdAt = new \DateTime();
-    
+
         return $this;
     }
 
@@ -103,7 +111,7 @@ class Result
     public function setUpdatedAt()
     {
         $this->updatedAt = new \DateTime();
-    
+
         return $this;
     }
 
@@ -116,25 +124,26 @@ class Result
     {
         return $this->updatedAt;
     }
-    
-    
-    
+
     /**
      *
      * @var File $file 
      */
     private $file;
-    
+
     /**
      * 
      * @return File
      */
     public function getFile()
     {
-        return $this->file;
+        if (file_exists($this->getAbsolutePath()))
+        {
+            return json_decode(file_get_contents($this->getAbsolutePath()));
+        }
     }
-    
-     /**
+
+    /**
      * Set file
      *
      * @param string $file
@@ -142,7 +151,7 @@ class Result
      */
     public function setFile($file)
     {
-        $this->file = $file;       
+        $this->file = $file;
         return $this;
     }
 
@@ -155,7 +164,7 @@ class Result
     {
         return $this->id;
     }
-  
+
     /**
      * Set path
      *
@@ -165,7 +174,7 @@ class Result
     public function setPath($path)
     {
         $this->path = $path;
-    
+
         return $this;
     }
 
@@ -178,21 +187,17 @@ class Result
     {
         return $this->path;
     }
-    
+
     //File Upload specific code
-    
-     public function getAbsolutePath()
+
+    public function getAbsolutePath()
     {
-        return null === $this->path
-            ? null
-            : $this->getUploadRootDir().'/'.$this->path;
+        return null === $this->path ? null : $this->getUploadRootDir() . '/' . $this->path;
     }
 
     public function getWebPath()
     {
-        return null === $this->path
-            ? null
-            : $this->getUploadDir().'/'.$this->path;
+        return null === $this->path ? null : $this->getUploadDir() . '/' . $this->path;
     }
 
     protected function getUploadRootDir()
@@ -208,17 +213,18 @@ class Result
         // when displaying uploaded doc/image in the view.
         return 'results';
     }
-    
-     /**
+
+    /**
      * @ORM\PrePersist()
      * @ORM\PreUpdate()
      */
     public function preUpload()
     {
-        if (null !== $this->file) {
+        if (null !== $this->file)
+        {
             // do whatever you want to generate a unique name
             $filename = sha1(uniqid(mt_rand(), true));
-            $this->path = $filename.'.txt';           
+            $this->path = $filename . '.txt';
         }
     }
 
@@ -228,15 +234,15 @@ class Result
      */
     public function upload()
     {
-        if (null === $this->file) {
+        if (null === $this->file)
+        {
             return;
         }
-        if(!is_dir($this->getUploadRootDir()))
+        if (!is_dir($this->getUploadRootDir()))
         {
             mkdir($this->getUploadRootDir());
         }
-         return file_put_contents($this->getUploadRootDir().'/'.$this->path,json_encode($this->file));
-
+        return file_put_contents($this->getUploadRootDir() . '/' . $this->path, json_encode($this->file));
     }
 
     /**
@@ -244,7 +250,8 @@ class Result
      */
     public function removeUpload()
     {
-        if ($file = $this->getAbsolutePath()) {
+        if ($file = $this->getAbsolutePath())
+        {
             unlink($file);
         }
     }
@@ -258,7 +265,7 @@ class Result
     public function setSearch(Search $search)
     {
         $this->search = $search;
-    
+
         return $this;
     }
 
@@ -281,7 +288,7 @@ class Result
     public function setSocialNetwork(SocialNetwork $socialNetwork)
     {
         $this->socialNetwork = $socialNetwork;
-    
+
         return $this;
     }
 
@@ -294,4 +301,24 @@ class Result
     {
         return $this->socialNetwork;
     }
+
+    public function getEntriesCount()
+    {
+        return $this->entriesCount;
+    }
+
+    /**
+     *
+     * @ORM\PrePersist()
+     *
+     * @param \DateTime $createdAt
+     * @return Search
+     */
+    public function setEntriesCount()
+    {
+        $this->entriesCount = count($this->file);
+
+        return $this;
+    }
+
 }
