@@ -57,7 +57,7 @@ class KeywordController extends Controller
     }
     
      /**
-     * @Route("/add/{assoc}", name="keyword_add", requirements={"assoc" = "\d+"}, defaults={"assoc" = "positive"})
+     * @Route("/add/{assoc}", name="keyword_add", defaults={"assoc" = "positive"})
      * @Template()
      */
     public function addAction($assoc)

@@ -10,7 +10,7 @@
 <header class="jumbotron subhead" id="overview">
   <div class="container">
     <h1>{{ 'Show Results'|trans }}</h1>
-    <p class="lead">Take a look inside the saved entries...</p>
+    <p class="lead">Take a look inside the saved entries for "{{result.search.name}}"...</p>
   </div>
 </header>
 <hr />
@@ -19,6 +19,7 @@
 <table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
     <tbody>
         <tr>
+            <th>#</th>
             <th>Date</th>
             <th>Message</th>
         </tr>
@@ -26,7 +27,8 @@
         {%for key,entity in result.getFile %}
         {%if key < count %}
             <tr>
-                <td>{{ entity.date| date('Y-m-d') }}</td>
+                <td>{{key+1}}</td>
+                <td style="white-space: nowrap;">{{ entity.date| date('Y-m-d') }}</td>
                 <td>{{ entity.text }}</td>
             </tr>
             {%endif%}
@@ -34,7 +36,7 @@
         
         {%if count < result.getFile|length%}
             <tr>
-                <td colspan="2"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
+                <td colspan="3"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
             </tr>   
         {%endif%}
     </tbody>

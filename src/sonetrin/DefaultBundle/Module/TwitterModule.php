@@ -18,7 +18,7 @@ class TwitterModule
     //array with date:user:text
     private $results_array;
     private $rpp = 100;
-    private $pages = 1;
+    private $pages = 10;
     private $lang = 'en';
     private $socialNetwork;
 
@@ -107,5 +107,5 @@ class TwitterModule
             return false;
         }
     }
-
+    
 }
