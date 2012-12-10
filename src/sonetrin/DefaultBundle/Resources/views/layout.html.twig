@@ -33,10 +33,10 @@
                 <a class="brand" href="{{ path('default_index') }}">sonetrin</a>
                 <div class="nav-collapse collapse">
                     <ul class="nav">
-                        <li {% if app.request.attributes.get('_route') == 'default_index' %} class="active" {%endif%}><a href="{{ path('default_index') }}">Start</a></li>
-                        <li {% if app.request.attributes.get('_route') == 'search' or app.request.attributes.get('_route') == 'search_run'  %} 
+                        <li {% if 'default_index' in app.request.attributes.get('_route') %} class="active" {%endif%}><a href="{{ path('default_index') }}">Start</a></li>
+                        <li {% if  'search' in app.request.attributes.get('_route') or 'result' in app.request.attributes.get('_route')  %} 
                             class="active" {%endif%}><a href="{{ path('search') }}">Search</a></li>
-                        <li {% if app.request.attributes.get('_route') == 'keyword_index' %} class="active" {%endif%} class="dropdown">
+                        <li {% if 'keyword' in app.request.attributes.get('_route') %} class="active" {%endif%} class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                               Settings
                               <b class="caret"></b>
@@ -49,7 +49,7 @@
                             </ul>
                         </li>
                        
-                        <li {% if app.request.attributes.get('_route') == 'default_about' %} class="active" {%endif%}><a href="{{ path('default_about') }}">About</a></li>
+                        <li {% if 'default_about' in app.request.attributes.get('_route') %} class="active" {%endif%}><a href="{{ path('default_about') }}">About</a></li>
                     </ul>
                 </div>
             </div>

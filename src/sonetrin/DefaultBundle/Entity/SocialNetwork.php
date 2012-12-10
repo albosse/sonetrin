@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SocialNetwork
 {
+
     /**
      * @var integer $id
      *
@@ -41,35 +42,42 @@ class SocialNetwork
      * @ORM\Column(name="hashtags", type="boolean")
      */
     private $hashtags;
-    
+
     /**
      * @var boolean $authRequired
      *
      * @ORM\Column(name="authRequired", type="boolean", options={"default" = 0})
      */
     private $authRequired;
-    
-     /**
+
+    /**
      * @var string $username
      *
      * @ORM\Column(name="username", type="string", length=255, nullable=true)
      */
     private $username;
-    
+
     /**
      * @var string $password
      *
      * @ORM\Column(name="password", type="string", length=255, nullable=true)
      */
     private $password;
-    
-        /**
+
+    /**
+     * @var string language
+     *
+     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"})
+     */
+    private $language;
+
+    /**
      * @var string $description
      *
-     * @ORM\Column(name="description", type="text")
+     * @ORM\Column(name="description", type="text", nullable=true)
      */
     private $description;
-    
+
     /**
      * Get id
      *
@@ -89,7 +97,7 @@ class SocialNetwork
     public function setName($name)
     {
         $this->name = $name;
-    
+
         return $this;
     }
 
@@ -112,7 +120,7 @@ class SocialNetwork
     public function setUrl($url)
     {
         $this->url = $url;
-    
+
         return $this;
     }
 
@@ -135,7 +143,7 @@ class SocialNetwork
     public function setHashtags($hashtags)
     {
         $this->hashtags = $hashtags;
-    
+
         return $this;
     }
 
@@ -158,7 +166,7 @@ class SocialNetwork
     public function setAuthRequired($authRequired)
     {
         $this->authRequired = $authRequired;
-    
+
         return $this;
     }
 
@@ -181,7 +189,7 @@ class SocialNetwork
     public function setUsername($username)
     {
         $this->username = $username;
-    
+
         return $this;
     }
 
@@ -204,7 +212,7 @@ class SocialNetwork
     public function setPassword($password)
     {
         $this->password = $password;
-    
+
         return $this;
     }
 
@@ -227,7 +235,7 @@ class SocialNetwork
     public function setDescription($description)
     {
         $this->description = $description;
-    
+
         return $this;
     }
 
@@ -240,4 +248,16 @@ class SocialNetwork
     {
         return $this->description;
     }
+
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+
 }
