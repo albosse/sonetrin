@@ -2,16 +2,16 @@
 {% block content %}
 
 <ul class="breadcrumb">
-  <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
-  <li><a href="{{path('result',{'search':result.search.id})}}">Results</a> <span class="divider">/</span></li>
-  <li class="active">Show</li>
+    <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
+    <li><a href="{{path('result',{'search':result.search.id})}}">Results</a> <span class="divider">/</span></li>
+    <li class="active">Show</li>
 </ul>
 
 <header class="jumbotron subhead" id="overview">
-  <div class="container">
-    <h1>{{ 'Show Results'|trans }}</h1>
-    <p class="lead">Take a look inside the saved entries for "{{result.search.name}}"...</p>
-  </div>
+    <div class="container">
+        <h1>{{ 'Show Results'|trans }}</h1>
+        <p class="lead">Take a look inside the saved entries for "{{result.search.name}}"...</p>
+    </div>
 </header>
 <hr />
 
@@ -22,31 +22,38 @@
             <th>#</th>
             <th>Date</th>
             <th>Message</th>
+            <th>Association</th>
         </tr>
 
         {%for key,entity in result.getFile %}
         {%if key < count %}
-            <tr>
-                <td>{{key+1}}</td>
-                <td style="white-space: nowrap;">{{ entity.date| date('Y-m-d') }}</td>
-                <td>{{ entity.text }}</td>
-            </tr>
+        <tr>
+            <td>{{key+1}}</td>
+            <td style="white-space: nowrap;">{{ entity.date| date('Y-m-d') }}</td>
+            <td>{{ entity.text }}</td>
+            <td>
+                <div class="action-list">
+                    <a href="#"><img src="{{ asset('images/icons/smiley_angry.png') }}" title="Negative" alt="Negative" class="action-inactive" /></a>
+                    <a href="#"><img src="{{ asset('images/icons/smiley_in_love.png') }}" title="Positive" alt="Positive" class="action-inactive" /></a>
+            </td>
+            </div>
+        </tr>
             {%endif%}
         {%endfor%}
-        
+
         {%if count < result.getFile|length%}
-            <tr>
-                <td colspan="3"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
-            </tr>   
+        <tr>
+            <td colspan="3"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
+        </tr>   
         {%endif%}
     </tbody>
 </table>
 
-    <a href="#" class="back-to-top" onclick="goToByScroll('top')">
-      <i class="icon-chevron-up icon-white"></i><br />
-        Back to <br />Top
-    </a>   
-    
+<a href="#" class="back-to-top" onclick="goToByScroll('top')">
+    <i class="icon-chevron-up icon-white"></i><br />
+    Back to <br />Top
+</a>   
+
 <script>
      
 function goToByScroll(id){
@@ -56,14 +63,14 @@ function goToByScroll(id){
 
 $(document).ready(function() 
 {
-	$('.back-to-top').addClass('hidden');
-	$.waypoints.settings.scrollThrottle = 50;
-	$('#wrapper').waypoint(function(event, direction) 
+        $('.back-to-top').addClass('hidden');
+        $.waypoints.settings.scrollThrottle = 50;
+        $('#wrapper').waypoint(function(event, direction) 
         {
-		$('.back-to-top').toggleClass('hidden', direction === "up");
-	});
+                $('.back-to-top').toggleClass('hidden', direction === "up");
+        });
 });
 
-</script>
+    </script>
 
 {% endblock %}

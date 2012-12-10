@@ -6,7 +6,18 @@
 <h1 class="page-header">{{ 'Search'|trans }} {{ 'creation'|trans }}</h1>
 
 <form class="form-horizontal" action="{{ path('search_create') }}" method="post" {{ form_enctype(form) }}>
+     
     {{ form_widget(form) }}
+    
+    <div class="alert alert-info">      
+        <small>
+            <i>Information: Seperate all desired search items by comma. Use hashtags or plain items.
+                All items will be combined using "AND". If you want to exclude an item, use "-item"
+            </i>
+        </small>
+    
+    </div>
+    
     <p>
         <button class="btn" type="submit">
             <i class="icon-plus"></i>

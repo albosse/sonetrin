@@ -6,10 +6,14 @@ use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Module\SocialNetworkInterface;
 
+//require_once '../Resources/api/googleapi/src/Google_Client.php';
+//require_once '../Resources/api/googleapi/src/contrib/Google_PlusService.php';
+//include_once 'TwitterModule.php';
+
 /**
  * Module to perform all Twitter specific operations
  */
-class TwitterModule implements SocialNetworkInterface
+class GooglePlusModule implements SocialNetworkInterface
 {
 
     private $em;
@@ -18,16 +22,16 @@ class TwitterModule implements SocialNetworkInterface
     private $results_raw;
     //array with date:user:text
     private $results_array;
-    private $rpp = 100;
-    private $pages = 1;
     private $lang = 'en';
     private $socialNetwork;
+    private $maxResults = 20;
+    private $cycles = 20;
 
     public function __construct($em, Search $search)
     {
         $this->em = $em;
         $this->search = $search;
-        $this->socialNetwork = $this->em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findOneBy(array('name' => 'Twitter'));
+        $this->socialNetwork = $this->em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findOneBy(array('name' => 'googleplus'));
     }
 
     /**
@@ -37,6 +41,8 @@ class TwitterModule implements SocialNetworkInterface
      */
     public function findResults()
     {
+        $key = "AIzaSyCrjO168nVV6RCsCMedcr5mEkO96P5bBSE";
+
         if (!isset($this->search))
         {
             throw new \Exception("No search available!");
@@ -53,10 +59,11 @@ class TwitterModule implements SocialNetworkInterface
             if ($item[0] == '#')
             {
                 $query .= '%23' . str_replace('#', '', $item);
-            } elseif ($item[0] == '@')
+            }elseif ($item[0] == '@')
             {
                 $query .= '%40' . str_replace('#', '', $item);
-            } else
+            }  
+            else
             {
                 $query .= '' . $item;
             }
@@ -65,24 +72,37 @@ class TwitterModule implements SocialNetworkInterface
                 $query .= '%20';
             }
         }
-
-//die(var_dump($query));
-
         $until = $this->search->getEndDate()->format('Y-m-d');
 
-        for ($page = 1; $page <= $this->pages; $page++)
+        $nextPageToken = '';
+
+        for ($page = 1; $page <= $this->cycles; $page++)
         {
-            $url = "http://search.twitter.com/search.json?q=" .
+            $url = "https://www.googleapis.com/plus/v1/activities?query=" .
                     $query .
-                    '&lang=' . $this->lang .
-                    '&until=' . $until .
-                    '&rpp=' . $this->rpp;
+                    //                    '&lang=' . $this->lang .
+                    //                    '&until=' . $until .
+//                    '&maxResults=100' . 
+                    '&key=' . $key;
+
+            if (isset($nextPageToken))
+            {
+                $url .= '&pageToken=' . $nextPageToken;
+            }
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-//            curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-            $this->results_raw[] = curl_exec($ch);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            $result = json_decode(curl_exec($ch));
+
+            $this->results_raw[] = $result;
+
+            $nextPageToken = $result->nextPageToken;
         }
+
+        $this->results_raw = array_values($this->results_raw);
 
         curl_close($ch);
 
@@ -93,18 +113,21 @@ class TwitterModule implements SocialNetworkInterface
     {
         if (false === is_null($this->results_raw))
         {
-            foreach ($this->results_raw as $result)
+//            $result = json_decode($this->results_raw);
+            foreach ($this->results_raw as $results)
             {
-                $result = json_decode($result);
-
-
-                foreach ($result->results as $tweet)
+                foreach ($results->items as $tweet)
                 {
+                    if ('' == strip_tags($tweet->object->content))
+                    {
+                        continue;
+                    }
                     $this->results_array[] = array(
-                        'id' => $tweet->id_str,
-                        'date' => $tweet->created_at,
-                        'user' => $tweet->from_user,
-                        'text' => $tweet->text);
+                        'id' => $tweet->id,
+                        'date' => $tweet->published,
+                        'user' => $tweet->actor->displayName,
+                        'title' => $tweet->title,
+                        'text' => strip_tags($tweet->object->content));
                 }
             }
         }

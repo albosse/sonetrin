@@ -282,6 +282,7 @@ class Search
 
     /**
      * Remove all results
+     * @ORM\PreUpdate()
      */
     public function removeAllResults()
     {

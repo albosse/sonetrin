@@ -25,6 +25,17 @@
     margin-left:5px;
 }
 
+.icon
+{
+    width: 20px;
+    margin-left:5px;
+}
+
+
+.action-inactive
+{
+    height: 30px;
+}
 a.letter {
     color: black;
     font-size: 10px;
@@ -77,11 +88,6 @@ a.back-to-top:hover
     color: white;
     text-decoration:none;
     background: #585858;
-}
-
-.result-list
-{
-    width:250px;
 }
 
 .label-cell

@@ -9,13 +9,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Form\SearchType;
 use sonetrin\DefaultBundle\Module\TwitterModule;
+use sonetrin\DefaultBundle\Module\GooglePlusModule;
 
 /**
  * Search controller.
  *
  * @Route("/search")
  */
-class SearchController extends Controller {
+class SearchController extends Controller
+{
 
     /**
      * Lists all Search entities.
@@ -23,7 +25,8 @@ class SearchController extends Controller {
      * @Route("/", name="search")
      * @Template()
      */
-    public function indexAction() {
+    public function indexAction()
+    {
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('sonetrinDefaultBundle:Search')->findAll();
@@ -39,12 +42,14 @@ class SearchController extends Controller {
      * @Route("/{id}/show", name="search_show")
      * @Template()
      */
-    public function showAction($id) {
+    public function showAction($id)
+    {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Search entity.');
         }
 
@@ -62,7 +67,8 @@ class SearchController extends Controller {
      * @Route("/new", name="search_new")
      * @Template()
      */
-    public function newAction() {
+    public function newAction()
+    {
         $entity = new Search();
         $form = $this->createForm(new SearchType(), $entity);
 
@@ -79,17 +85,19 @@ class SearchController extends Controller {
      * @Method("post")
      * @Template("sonetrinDefaultBundle:Search:new.html.twig")
      */
-    public function createAction() {
+    public function createAction()
+    {
         $entity = new Search();
         $request = $this->getRequest();
         $form = $this->createForm(new SearchType(), $entity);
         $form->bindRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid())
+        {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
-            
+
             $this->get('session')->getFlashBag()->add('notice', 'Your changes were saved!');
             return $this->redirect($this->generateUrl('search'));
         }
@@ -106,12 +114,14 @@ class SearchController extends Controller {
      * @Route("/{id}/edit", name="search_edit")
      * @Template()
      */
-    public function editAction($id) {
+    public function editAction($id)
+    {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Search entity.');
         }
 
@@ -132,12 +142,14 @@ class SearchController extends Controller {
      * @Method("post")
      * @Template("sonetrinDefaultBundle:Search:edit.html.twig")
      */
-    public function updateAction($id) {
+    public function updateAction($id)
+    {
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Search entity.');
         }
 
@@ -148,10 +160,11 @@ class SearchController extends Controller {
 
         $editForm->bindRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isValid())
+        {
             $em->persist($entity);
             $em->flush();
-            
+
             $this->get('session')->getFlashBag()->add('notice', 'Your changes were saved!');
             return $this->redirect($this->generateUrl('search'));
         }
@@ -169,7 +182,8 @@ class SearchController extends Controller {
      * @Route("/{id}/delete", name="search_delete")
      * @Method({"GET","POST"})
      */
-    public function deleteAction($id) {
+    public function deleteAction($id)
+    {
         $form = $this->createDeleteForm($id);
         $request = $this->getRequest();
 
@@ -179,7 +193,8 @@ class SearchController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $entity = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Search entity.');
         }
 
@@ -190,7 +205,8 @@ class SearchController extends Controller {
         return $this->redirect($this->generateUrl('search'));
     }
 
-    private function createDeleteForm($id) {
+    private function createDeleteForm($id)
+    {
         return $this->createFormBuilder(array('id' => $id))
                         ->add('id', 'hidden')
                         ->getForm()
@@ -202,35 +218,58 @@ class SearchController extends Controller {
      *
      * @Route("/run/{id}", name="search_run", requirements={"id" = "\d+"})
      */
-    public function runAction($id) {
+    public function runAction($id)
+    {
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
         $search->removeAllResults();
+        
+        foreach($search->getSocialNetwork() as $sn)
+        {
+            switch($sn->getName())
+            {
+                case 'twitter':
+                   $status = $this->getTwitterResults($search);    
+                break;  
+                case 'googleplus':
+                   $status = $this->getGooglePlusResults($search);
+                break;
+            }
+        }
+       
+ 
+        //Inform user about status
+        if (true === $status)
+        {
+            $this->get('session')->getFlashBag()->add('notice', 'Your results were saved!');
+        } else
+        {
+            $this->get('session')->getFlashBag()->add('warning', 'Warning: Twitter results were not saved.');
+        }
 
-        $twitterStatus = $this->getTwitterResults($search);
-        
-         //Inform user about status
-        if(true === $twitterStatus)
-        {
-             $this->get('session')->getFlashBag()->add('notice', 'Your results were saved!');
-        }else
-        {
-             $this->get('session')->getFlashBag()->add('warning', 'Warning: Twitter results were not saved.');
-        }  
-        
         //Get new search entity with new results
         $em->refresh($search);
         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
-    
+
     private function getTwitterResults($search)
     {
         $em = $this->getDoctrine()->getManager();
-        $tm = new TwitterModule($em,$search);
-        $tm->findTwitterResults();
-        
+        $tm = new TwitterModule($em, $search);
+        $tm->findResults();
+
         //Inform user about status
-        return $tm->saveResult();
+        return $tm->saveResults();
     }
-       
+
+    private function getGooglePlusResults($search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $gpm = new GooglePlusModule($em, $search);
+        $gpm->findResults();
+
+        //Inform user about status
+        return $gpm->saveResults();
+    }
+
 }

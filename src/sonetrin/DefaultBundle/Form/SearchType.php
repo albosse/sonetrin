@@ -12,7 +12,7 @@ class SearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
+            ->add('name',null,array('label' => 'Search'))
             ->add('startDate',null,array(
                     'years' => range(2000,date('Y',time()))
                 ))
