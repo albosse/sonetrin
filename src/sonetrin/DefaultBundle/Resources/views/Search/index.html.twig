@@ -17,7 +17,6 @@
             <th>{{ 'SocialNetwork'|trans }}</th>
             <th>{{ 'Startdate'|trans }}</th>
             <th>{{ 'Enddate'|trans }}</th>
-            <th>{{ 'Semantic'|trans }}</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -33,7 +32,6 @@
             </td>
             <td>{% if entity.startDate %}{{ entity.startDate|date('Y-m-d') }}{% endif %}</td>
             <td>{% if entity.endDate %}{{ entity.endDate|date('Y-m-d') }}{% endif %}</td>
-            <td><i class="{{ entity.semantic ? 'icon-check' : '' }}"></i></td>
             <td>
                
                {% if entity.hasResult  %} 
@@ -57,7 +55,12 @@
                 <a class="btn btn-mini" href="{{ path('search_edit', { 'id': entity.id }) }}">
                     <i class="icon-pencil"></i>
                     {{ 'edit'|trans }}
-                </a>   
+                </a>
+                <a onclick='return confirm("Really delete this search?")' class="btn btn-mini btn-danger" href="{{ path('search_delete', { 'id': entity.id }) }}">
+                    <i class="icon-trash"></i>
+                    {{ 'delete'|trans }}
+                </a>
+                
                 {% if entity.hasResult() %}
                     <a class="btn btn-mini btn-info" href="{{ path('result', { 'search': entity.id }) }}">
                         <i class="icon-tasks"></i>

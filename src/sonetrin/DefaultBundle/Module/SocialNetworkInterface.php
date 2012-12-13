@@ -9,9 +9,8 @@ interface SocialNetworkInterface
 
     public function findResults();
 
-    public function returnResults();
+    public function processResults();
 
-    public function saveResults();
 }
 
 ?>

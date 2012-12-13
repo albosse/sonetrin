@@ -23,9 +23,7 @@ class ResultController extends Controller
      */
     public function indexAction(Search $search)
     {
-        $assocArray = $this->matchKeywords($search->getResult());
-        return array('entity' => $search,
-            'associations' => $assocArray);
+        return array('entity' => $search);
     }
 
     /**
@@ -36,11 +34,11 @@ class ResultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $result = $em->getRepository('sonetrinDefaultBundle:Result')->find($id->getId());
-//       die(print_r($result->getFile()));
 
-        if ($count > count($result->getFile()))
+
+        if ($count > count($result->getItem()))
         {
-            $count = count($result->getFile());
+            $count = count($result->getItem());
         }
         return array('result' => $result,
             'count' => $count);
@@ -62,33 +60,54 @@ class ResultController extends Controller
         }
         return $this->redirect($this->generateUrl('result', array('search' => $id->getSearch()->getId())));
     }
-
-    public function matchKeywords($results)
+     
+    /**
+     * @Route("/test/{search}", name="result_test")
+     * @Template()
+     */
+    public function testAction(Search $search)
     {
-        $assocArray = array('positive' => 0, 'negative' => 0, 'unknown' => 0);
+        require_once __DIR__ . '/../Resources/api/opinion-mining/Example.php';
 
-        $em = $this->getDoctrine()->getManager();
-        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
-
-        foreach ($results as $id)
+        $sentences = array();
+        $results = $search->getResult();
+     
+        foreach ($results as $result)
         {
-            $file = $id->getFile();
-
+            $file = $result->getFile();
+      
             foreach ($file as $entity)
             {
-                foreach ($keywords as $keyword)
-                {
-                    if (preg_match('|' . $keyword->getEnglish() . ' |Ui',$entity->text))
-                    {
-                       $assocArray[$keyword->getAssociation()]++;
-                       //Merken welcher Eintrag Positiv und wel ist
-                       break;
-                    }                                      
-
-                }
+                $sentences[] = $entity->text;
             }
         }
-        return $assocArray;
+        
+        $ex = new \Example();
+        $ex->runFile($sentences);
+        return array();
     }
+    
+     /**
+     * @Route("/cake", name="result_cake_graph")
+     * 
+     */
+    public function cake()
+    {
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
 
+        $data = array(60, 40);
+
+        $graph = new \PieGraph(300, 200, "auto");
+        $graph->SetShadow();
+
+        $graph->title->SetFont(FF_FONT1, FS_BOLD);
+
+        $p1 = new \PiePlot($data);
+        $p1->SetLegends(array('pos','neg'));     
+        $graph->legend->SetPos(0.5,0.98,'center','bottom');
+ 
+        $graph->Add($p1);
+        $graph->Stroke();
+    }
 }

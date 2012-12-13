@@ -14,57 +14,62 @@
 </header>
 <hr />
 
-<table class="table span5">
-    <tr>
-        <td class="label-cell">Query for:</td><td>{{entity.name}}</td>
-    </tr>  
-    <tr>
-        <td class="label-cell">Since:</td><td>{{entity.startDate|date('Y-m-d')}}</td>
-    </tr>
-    <tr>
-        <td class="label-cell">Until:</td><td>{{entity.endDate|date('Y-m-d')}}</td>
-    </tr>
-    <tr>
-        <td class="label-cell">Social Networks:</td>
-        <td>
-            <table class="result-list">
-          {% for result in entity.result %}
-                    <tr>
-                        <td>{{result.socialNetwork.name}}</td>
-                        <td>{{result.entriesCount}}</td>
-                        <td>  
-                            <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
-                                <i class="icon-eye-open"></i>
-                  {{ 'show'|trans }}
-                            </a>
-                            <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
-                                <i class="icon-remove-sign"></i>
-                                Remove
-                            </a>
-                        </td>
-                    </tr> 
-           {% else%}
-                    No entries found.
-          {% endfor %}
-                </table>
-            </td>
-        </tr> 
+<div id="results-left" class="span5">
+
+    <table class="table span5">
         <tr>
-            <td class="label-cell">Associations:</td>
-            <td>
-                <table class="table">
-                    <tr>
-                        <td> <a href="#">Positive</a></td>
-                        <td>{{associations.positive}}</td>
-                    </tr>
-                    <tr>
-                        <td><a href="#">Negative</a></td>
-                        <td>{{associations.negative}}</td>
-                    </tr>
-                </table>
-            </td>
+            <td class="label-cell">Query for:</td><td>{{entity.name}}</td>
+        </tr>  
+        <tr>
+            <td class="label-cell">Since:</td><td>{{entity.startDate|date('Y-m-d')}}</td>
         </tr>
+        <tr>
+            <td class="label-cell">Until:</td><td>{{entity.endDate|date('Y-m-d')}}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Social Networks:</td>
+            <td>
+                <table class="result-list">
+          {% for result in entity.result %}
+                        <tr>
+                            <td>{{result.socialNetwork.name}}</td>
+                            <td>{{result.item|length}}</td>
+                            <td>  
+                                <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
+                                    <i class="icon-eye-open"></i>
+                  {{ 'show'|trans }}
+                                </a>
+                                <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
+                                    <i class="icon-remove-sign"></i>
+                                    Remove
+                                </a>
+                            </td>
+                        </tr> 
+           {% else%}
+                        No entries found.
+          {% endfor %}
+                    </table>
+                </td>
+            </tr> 
+            <tr>
+                <td class="label-cell">Sentiments:</td>
+                <td>
+                    <img src="{{path('result_cake_graph')}}" />
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div id="results-right" class="span5 offset1">
+
+        <table class="table">
+            <tr>
+                <td>Test</td>
+            
+            </tr>
+        </table>
+    </div>
 
 
-    </table>
 {% endblock %}

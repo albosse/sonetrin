@@ -15,22 +15,23 @@
 </header>
 <hr />
 
-<p>Displaying entries 1-{{count}} / {{result.getFile|length}}</p>
+ <p>Displaying entries 1-{{count}} / {{result.item|length}}</p> 
+
 <table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
     <tbody>
         <tr>
             <th>#</th>
             <th>Date</th>
             <th>Message</th>
-            <th>Association</th>
+            <th>Sentiment</th>
         </tr>
 
-        {%for key,entity in result.getFile %}
+        {%for key,entity in result.item %}
         {%if key < count %}
         <tr>
             <td>{{key+1}}</td>
-            <td style="white-space: nowrap;">{{ entity.date| date('Y-m-d') }}</td>
-            <td>{{ entity.text }}</td>
+            <td style="white-space: nowrap;">{{ entity.created| date('Y-m-d') }}</td>
+            <td>{{ entity.message }}</td>
             <td>
                 <div class="action-list">
                     <a href="#"><img src="{{ asset('images/icons/smiley_angry.png') }}" title="Negative" alt="Negative" class="action-inactive" /></a>
@@ -41,7 +42,7 @@
             {%endif%}
         {%endfor%}
 
-        {%if count < result.getFile|length%}
+        {%if  result.item %}
         <tr>
             <td colspan="3"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
         </tr>   

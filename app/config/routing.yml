@@ -7,3 +7,10 @@ sonetrin_default:
 #_internal:
 #    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
 #    prefix:   /_internal
+
+login:
+    pattern:   /login
+    defaults:  { _controller: sonetrinDefaultBundle:Default:login }
+    
+login_check:
+    pattern:   /login_check

@@ -237,16 +237,6 @@ class SearchController extends Controller
             }
         }
        
- 
-        //Inform user about status
-        if (true === $status)
-        {
-            $this->get('session')->getFlashBag()->add('notice', 'Your results were saved!');
-        } else
-        {
-            $this->get('session')->getFlashBag()->add('warning', 'Warning: Twitter results were not saved.');
-        }
-
         //Get new search entity with new results
         $em->refresh($search);
         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
@@ -257,9 +247,6 @@ class SearchController extends Controller
         $em = $this->getDoctrine()->getManager();
         $tm = new TwitterModule($em, $search);
         $tm->findResults();
-
-        //Inform user about status
-        return $tm->saveResults();
     }
 
     private function getGooglePlusResults($search)
@@ -267,9 +254,6 @@ class SearchController extends Controller
         $em = $this->getDoctrine()->getManager();
         $gpm = new GooglePlusModule($em, $search);
         $gpm->findResults();
-
-        //Inform user about status
-        return $gpm->saveResults();
     }
 
 }

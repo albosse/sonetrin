@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * sonetrin\DefaultBundle\Entity\SocialNetwork
  *
- * @ORM\Table(name="socialNetwork")
+ * @ORM\Table(name="socialnetwork")
  * @ORM\Entity(repositoryClass="sonetrin\DefaultBundle\Repository\SocialNetworkRepository")
  */
 class SocialNetwork
@@ -37,37 +37,23 @@ class SocialNetwork
     private $url;
 
     /**
-     * @var boolean $hashtags
-     *
-     * @ORM\Column(name="hashtags", type="boolean")
-     */
-    private $hashtags;
-
-    /**
      * @var boolean $authRequired
      *
-     * @ORM\Column(name="authRequired", type="boolean", options={"default" = 0})
+     * @ORM\Column(name="authRequired", type="boolean", options={"default" = 0}, nullable=true)
      */
     private $authRequired;
 
     /**
-     * @var string $username
+     * @var string $api_key
      *
-     * @ORM\Column(name="username", type="string", length=255, nullable=true)
+     * @ORM\Column(name="api_key", type="string", length=255, nullable=true)
      */
-    private $username;
-
-    /**
-     * @var string $password
-     *
-     * @ORM\Column(name="password", type="string", length=255, nullable=true)
-     */
-    private $password;
+    private $api_key;
 
     /**
      * @var string language
      *
-     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"})
+     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"}, nullable=true)
      */
     private $language;
 
@@ -77,6 +63,7 @@ class SocialNetwork
      * @ORM\Column(name="description", type="text", nullable=true)
      */
     private $description;
+
 
     /**
      * Get id
@@ -97,7 +84,7 @@ class SocialNetwork
     public function setName($name)
     {
         $this->name = $name;
-
+    
         return $this;
     }
 
@@ -120,7 +107,7 @@ class SocialNetwork
     public function setUrl($url)
     {
         $this->url = $url;
-
+    
         return $this;
     }
 
@@ -135,29 +122,6 @@ class SocialNetwork
     }
 
     /**
-     * Set hashtags
-     *
-     * @param boolean $hashtags
-     * @return SocialNetwork
-     */
-    public function setHashtags($hashtags)
-    {
-        $this->hashtags = $hashtags;
-
-        return $this;
-    }
-
-    /**
-     * Get hashtags
-     *
-     * @return boolean 
-     */
-    public function getHashtags()
-    {
-        return $this->hashtags;
-    }
-
-    /**
      * Set authRequired
      *
      * @param boolean $authRequired
@@ -166,7 +130,7 @@ class SocialNetwork
     public function setAuthRequired($authRequired)
     {
         $this->authRequired = $authRequired;
-
+    
         return $this;
     }
 
@@ -181,49 +145,26 @@ class SocialNetwork
     }
 
     /**
-     * Set username
+     * Set language
      *
-     * @param string $username
+     * @param string $language
      * @return SocialNetwork
      */
-    public function setUsername($username)
+    public function setLanguage($language)
     {
-        $this->username = $username;
-
+        $this->language = $language;
+    
         return $this;
     }
 
     /**
-     * Get username
+     * Get language
      *
      * @return string 
      */
-    public function getUsername()
+    public function getLanguage()
     {
-        return $this->username;
-    }
-
-    /**
-     * Set password
-     *
-     * @param string $password
-     * @return SocialNetwork
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Get password
-     *
-     * @return string 
-     */
-    public function getPassword()
-    {
-        return $this->password;
+        return $this->language;
     }
 
     /**
@@ -235,7 +176,7 @@ class SocialNetwork
     public function setDescription($description)
     {
         $this->description = $description;
-
+    
         return $this;
     }
 
@@ -249,15 +190,26 @@ class SocialNetwork
         return $this->description;
     }
 
-    public function getLanguage()
+    /**
+     * Set api_key
+     *
+     * @param string $apiKey
+     * @return SocialNetwork
+     */
+    public function setApiKey($apiKey)
     {
-        return $this->language;
+        $this->api_key = $apiKey;
+    
+        return $this;
     }
 
-    public function setLanguage($language)
+    /**
+     * Get api_key
+     *
+     * @return string 
+     */
+    public function getApiKey()
     {
-        $this->language = $language;
+        return $this->api_key;
     }
-
-
 }

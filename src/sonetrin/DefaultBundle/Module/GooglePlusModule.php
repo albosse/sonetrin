@@ -5,23 +5,18 @@ namespace sonetrin\DefaultBundle\Module;
 use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Module\SocialNetworkInterface;
-
-//require_once '../Resources/api/googleapi/src/Google_Client.php';
-//require_once '../Resources/api/googleapi/src/contrib/Google_PlusService.php';
-//include_once 'TwitterModule.php';
+use sonetrin\DefaultBundle\Entity\Item;
 
 /**
  * Module to perform all Twitter specific operations
  */
 class GooglePlusModule implements SocialNetworkInterface
 {
-
     private $em;
     private $search;
     //json
     private $results_raw;
     //array with date:user:text
-    private $results_array;
     private $lang = 'en';
     private $socialNetwork;
     private $maxResults = 20;
@@ -41,8 +36,11 @@ class GooglePlusModule implements SocialNetworkInterface
      */
     public function findResults()
     {
-        $key = "AIzaSyCrjO168nVV6RCsCMedcr5mEkO96P5bBSE";
-
+        if(true === $this->socialNetwork->getAuthRequired())
+        {
+            $key = $this->socialNetwork->getApiKey();
+        }
+        
         if (!isset($this->search))
         {
             throw new \Exception("No search available!");
@@ -72,18 +70,21 @@ class GooglePlusModule implements SocialNetworkInterface
                 $query .= '%20';
             }
         }
-        $until = $this->search->getEndDate()->format('Y-m-d');
+//        $until = $this->search->getEndDate()->format('Y-m-d');
 
         $nextPageToken = '';
 
         for ($page = 1; $page <= $this->cycles; $page++)
         {
-            $url = "https://www.googleapis.com/plus/v1/activities?query=" .
-                    $query .
+            $url = $this->socialNetwork->getUrl() .
+                    $query;
                     //                    '&lang=' . $this->lang .
                     //                    '&until=' . $until .
 //                    '&maxResults=100' . 
-                    '&key=' . $key;
+            if(isset($key))
+            {
+                $url .= '&key=' . $key;
+            }
 
             if (isset($nextPageToken))
             {
@@ -99,21 +100,24 @@ class GooglePlusModule implements SocialNetworkInterface
 
             $this->results_raw[] = $result;
 
-            $nextPageToken = $result->nextPageToken;
+            $nextPageToken = isset($result->nextPageToken) ? $result->nextPageToken :'' ;
         }
 
         $this->results_raw = array_values($this->results_raw);
 
         curl_close($ch);
 
-        $this->returnResults();
+        $this->processResults();
     }
 
-    public function returnResults()
+    public function processResults()
     {
         if (false === is_null($this->results_raw))
         {
-//            $result = json_decode($this->results_raw);
+            $result_model = new Result();
+            $result_model->setSearch($this->search);
+            $result_model->setSocialNetwork($this->socialNetwork);
+            
             foreach ($this->results_raw as $results)
             {
                 foreach ($results->items as $tweet)
@@ -122,41 +126,18 @@ class GooglePlusModule implements SocialNetworkInterface
                     {
                         continue;
                     }
-                    $this->results_array[] = array(
-                        'id' => $tweet->id,
-                        'date' => $tweet->published,
-                        'user' => $tweet->actor->displayName,
-                        'title' => $tweet->title,
-                        'text' => strip_tags($tweet->object->content));
+                    $item = new Item();
+                    $item->setAuthor($tweet->actor->displayName);
+                    $item->setCreated(new \DateTime($tweet->published));
+                    $item->setMessage(strip_tags($tweet->object->content));
+                    $item->setMessage_id($tweet->id);
+                    $item->setResult($result_model);
+                    $result_model->addItem($item);
                 }
             }
         }
 
-        if (count($this->results_array) === 0 || $this->results_array == null)
-        {
-            return false;
-        } else
-        {
-            return $this->results_array;
-        }
+        $this->em->persist($result_model);
+        $this->em->flush();
     }
-
-    public function saveResults()
-    {
-        if (count($this->results_array) >= 1)
-        {
-            $result = new Result($this->results_array);
-            $result->setSearch($this->search);
-            $result->setSocialNetwork($this->socialNetwork);
-
-            $this->em->persist($result);
-            $this->em->flush();
-
-            return true;
-        } else
-        {
-            return false;
-        }
-    }
-
 }

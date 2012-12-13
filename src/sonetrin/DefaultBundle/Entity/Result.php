@@ -18,16 +18,6 @@ class Result
 {
 
     /**
-     * 
-     * @param $network The network name
-     * @param $file The file to create
-     */
-    public function __construct($file)
-    {
-        $this->file = $file;
-    }
-
-    /**
      * @var integer $id
      *
      * @ORM\Column(name="id", type="integer")
@@ -35,15 +25,15 @@ class Result
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
+    
     /**
-     * @var string $path
      *
-     * @ORM\Column(name="path", type="string", length=255)
-     * @Assert\NotBlank
+     * @var integer $item 
+     * 
+     * @ORM\OneToMany(targetEntity="Item", mappedBy="result", cascade={"remove", "persist"})
      */
-    private $path;
-
+    private $item;
+    
     /**
      *  @var integer $search
      * 
@@ -57,13 +47,6 @@ class Result
      * @ORM\ManyToOne(targetEntity="SocialNetwork")
      */
     private $socialNetwork;
-
-    /**
-     * @var integer $entriesCount
-     * 
-     * @ORM\Column(name="entriesCount", type="integer")
-     */
-    private $entriesCount;
 
     /**
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
@@ -125,36 +108,7 @@ class Result
         return $this->updatedAt;
     }
 
-    /**
-     *
-     * @var File $file 
-     */
-    private $file;
-
-    /**
-     * 
-     * @return File
-     */
-    public function getFile()
-    {
-        if (file_exists($this->getAbsolutePath()))
-        {
-            return json_decode(file_get_contents($this->getAbsolutePath()));
-        }
-    }
-
-    /**
-     * Set file
-     *
-     * @param string $file
-     * @return Result
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-        return $this;
-    }
-
+   
     /**
      * Get id
      *
@@ -163,97 +117,6 @@ class Result
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set path
-     *
-     * @param string $path
-     * @return Result
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get path
-     *
-     * @return string 
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    //File Upload specific code
-
-    public function getAbsolutePath()
-    {
-        return null === $this->path ? null : $this->getUploadRootDir() . '/' . $this->path;
-    }
-
-    public function getWebPath()
-    {
-        return null === $this->path ? null : $this->getUploadDir() . '/' . $this->path;
-    }
-
-    protected function getUploadRootDir()
-    {
-        // the absolute directory path where uploaded
-        // documents should be saved
-        return $this->getUploadDir();
-    }
-
-    protected function getUploadDir()
-    {
-        // get rid of the __DIR__ so it doesn't screw up
-        // when displaying uploaded doc/image in the view.
-        return 'results';
-    }
-
-    /**
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
-     */
-    public function preUpload()
-    {
-        if (null !== $this->file)
-        {
-            // do whatever you want to generate a unique name
-            $filename = sha1(uniqid(mt_rand(), true));
-            $this->path = $filename . '.txt';
-        }
-    }
-
-    /**
-     * @ORM\PostPersist()
-     * @ORM\PostUpdate()
-     */
-    public function upload()
-    {
-        if (null === $this->file)
-        {
-            return;
-        }
-        if (!is_dir($this->getUploadRootDir()))
-        {
-            mkdir($this->getUploadRootDir());
-        }
-        return file_put_contents($this->getUploadRootDir() . '/' . $this->path, json_encode($this->file));
-    }
-
-    /**
-     * @ORM\PostRemove()
-     */
-    public function removeUpload()
-    {
-        if ($file = $this->getAbsolutePath())
-        {
-            unlink($file);
-        }
     }
 
     /**
@@ -301,24 +164,37 @@ class Result
     {
         return $this->socialNetwork;
     }
-
-    public function getEntriesCount()
-    {
-        return $this->entriesCount;
-    }
-
+ 
     /**
+     * Add item
      *
-     * @ORM\PrePersist()
-     *
-     * @param \DateTime $createdAt
-     * @return Search
+     * @param \sonetrin\DefaultBundle\Entity\Item $item
+     * @return Result
      */
-    public function setEntriesCount()
+    public function addItem(\sonetrin\DefaultBundle\Entity\Item $item)
     {
-        $this->entriesCount = count($this->file);
-
+        $this->item[] = $item;
+    
         return $this;
     }
 
+    /**
+     * Remove item
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Item $item
+     */
+    public function removeItem(\sonetrin\DefaultBundle\Entity\Item $item)
+    {
+        $this->item->removeElement($item);
+    }
+
+    /**
+     * Get item
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getItem()
+    {
+        return $this->item;
+    }
 }

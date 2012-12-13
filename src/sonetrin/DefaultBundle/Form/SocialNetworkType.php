@@ -13,11 +13,9 @@ class SocialNetworkType extends AbstractType
         $builder
             ->add('name')
             ->add('url')
-            ->add('hashtags', null, array('required' => false))
             ->add('authRequired', null, array('required' => false))
             ->add('language', 'choice', array('choices' => array('en' => 'English','de' => 'German')))
-            ->add('username',null,array('required' => false))
-            ->add('password','password',array('required' => false))
+            ->add('api_key',null,array('required' => false))
             ->add('description',null,array('required' => false,
                                                'attr' => array('rows' => '5')))  
         ;
