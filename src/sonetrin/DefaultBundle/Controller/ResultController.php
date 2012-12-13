@@ -22,7 +22,7 @@ class ResultController extends Controller
      * @Template()
      */
     public function indexAction(Search $search)
-    {
+    {       
         return array('entity' => $search);
     }
 
@@ -98,15 +98,17 @@ class ResultController extends Controller
 
         $data = array(60, 40);
 
-        $graph = new \PieGraph(300, 200, "auto");
+        $graph = new \PieGraph(300, 200);
         $graph->SetShadow();
 
-        $graph->title->SetFont(FF_FONT1, FS_BOLD);
+        $graph->title->SetFont(FF_FONT1, FS_BOLD,20);
 
         $p1 = new \PiePlot($data);
         $p1->SetLegends(array('pos','neg'));     
-        $graph->legend->SetPos(0.5,0.98,'center','bottom');
- 
+        
+        $graph->legend->SetPos(0.0,0.1,'right','center');
+        $graph->legend->SetFont(FF_FONT1, FS_BOLD, 24);
+
         $graph->Add($p1);
         $graph->Stroke();
     }

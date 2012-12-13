@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Item
  *
  * @ORM\Table(name="result_item")
- * @ORM\Entity
+  * @ORM\Entity(repositoryClass="sonetrin\DefaultBundle\Repository\ItemRepository")
  */
 class Item
 {

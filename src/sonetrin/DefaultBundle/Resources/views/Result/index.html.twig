@@ -13,7 +13,6 @@
     </div>
 </header>
 <hr />
-
 <div id="results-left" class="span5">
 
     <table class="table span5">
@@ -30,14 +29,14 @@
             <td class="label-cell">Social Networks:</td>
             <td>
                 <table class="result-list">
-          {% for result in entity.result %}
+                     {% for result in entity.result %}
                         <tr>
                             <td>{{result.socialNetwork.name}}</td>
                             <td>{{result.item|length}}</td>
                             <td>  
                                 <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
                                     <i class="icon-eye-open"></i>
-                  {{ 'show'|trans }}
+                                    {{ 'show'|trans }}
                                 </a>
                                 <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
                                     <i class="icon-remove-sign"></i>
@@ -45,29 +44,47 @@
                                 </a>
                             </td>
                         </tr> 
-           {% else%}
+                   {% else%}
                         No entries found.
-          {% endfor %}
+                    {% endfor %}
                     </table>
                 </td>
             </tr> 
             <tr>
                 <td class="label-cell">Sentiments:</td>
-                <td>
+                <td class="span9">
                     <img src="{{path('result_cake_graph')}}" />
                 </td>
             </tr>
         </table>
-
     </div>
 
     <div id="results-right" class="span5 offset1">
 
-        <table class="table">
-            <tr>
-                <td>Test</td>
-            
-            </tr>
+          <table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
+            <tbody>
+                <tr>
+                    <th>Created</th>
+                    <th>Message</th>
+                    <th>Sentiment</th>
+                </tr>
+             {% for result in entity.result %}
+                {%for key,entity in result.item %}
+                    {%if key < 20 %}
+                        <tr>
+                            <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
+                            <td>{{ entity.message }}</td>
+                            <td>
+                                <div class="action-list">
+                                    <a href="#"><img src="{{ asset('images/icons/smiley_angry.png') }}" title="Negative" alt="Negative" class="action-inactive" /></a>
+                                    <a href="#"><img src="{{ asset('images/icons/smiley_in_love.png') }}" title="Positive" alt="Positive" class="action-inactive" /></a>                       
+                              </div>
+                            </td>         
+                        </tr>
+                   {%endif%}
+              {%endfor%}
+           {% endfor %}
+            </tbody>
         </table>
     </div>
 
