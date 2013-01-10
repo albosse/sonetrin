@@ -111,6 +111,12 @@ class ResultController extends Controller
 
             foreach ($items as $item)
             {
+                //if item already has a sentiment
+                if(false === is_null($item->getSentiment()))
+                {
+                    continue;
+                }
+                
                 $message = $item->getMessage();
 
                 foreach ($keywords as $keyword)
@@ -164,5 +170,23 @@ class ResultController extends Controller
         $em->flush();
         
          return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+    }
+    
+    /**
+     * @Route("/removeUndefined", name="result_removeUndefinedResults")
+     */
+    public function removeUndefinedAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $results = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => null));
+        
+        foreach($results as $result)
+        {
+            $em->remove($result);
+        }
+        $em->flush();
+        
+        return $this->redirect($this->generateUrl('search'));
+              
     }
 }

@@ -12,139 +12,145 @@
     </div>
 </header>
 <hr />
-<div id="results-left" class="span5">
+{% if entity.result|length > 0 %}
 
-    <table class="table span5">
-        <legend>Search Information</legend>
-        <tr>
-            <td class="label-cell">Interval:</td><td>{{entity.startDate|date('Y-m-d')}} - {{entity.endDate|date('Y-m-d')}}</td>
-        </tr>
-        <tr>
-            <td class="label-cell">Social Networks:</td>
-            <td>
-                <table class="result-list">
+<div id="result-content">
+
+    <div id="results-left" class="span5">
+        <table class="table span5">
+            <legend>Search Information</legend>
+            <tr>
+                <td class="label-cell">Interval:</td><td>{{entity.startDate|date('Y-m-d')}} - {{entity.endDate|date('Y-m-d')}}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Social Networks:</td>
+                <td>
+                    <table class="result-list">
                      {% for result in entity.result %}
-                        <tr>
-                            <td>{{result.socialNetwork.name}}</td>
-                            <td>{{result.item|length}}</td>
-                            <td>  
-                                <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
-                                    <i class="icon-eye-open"></i>
+                            <tr>
+                                <td>{{result.socialNetwork.name}}</td>
+                                <td>{{result.item|length}}</td>
+                                <td>  
+                                    <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
+                                        <i class="icon-eye-open"></i>
                                     {{ 'show'|trans }}
-                                </a>
-                                <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
-                                    <i class="icon-remove-sign"></i>
-                                    Remove
-                                </a>
-                            </td>
-                        </tr> 
+                                    </a>
+                                    <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
+                                        <i class="icon-remove-sign"></i>
+                                        Remove
+                                    </a>
+                                </td>
+                            </tr> 
                    {% else%}
-                        No entries found.
+                            No entries found.
                     {% endfor %}
-                    </table>
-                </td>
-            </tr> 
-        </table>
-        
-        <legend>Sentiments
-        {% if sentimentCount['positive'] == 0 and sentimentCount['negative'] == 0%}
-        <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
-            <i class="icon-screenshot"></i>
-            Analyze Results
-        </a>   
-        {%else%}
-        <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
-            <i class="icon-screenshot"></i>
-            Analyze Results
-        </a>   
-            <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
-                <i class="icon-remove-sign"></i>
-                Remove sentiments
-            </a>
-         </legend>
-        <div id="pie-graph">
-            <img src="{{path('result_cake_graph', {search: entity.id } )}}" />
-        </div>
-         {%endif%}
-       <div id="loader">
-            <img class="span2" src="{{asset('images/loader.gif')}}" />
-        </div>
-    </div>
-
-    <div id="results-right" class="span5 offset1">
-
-        <table id="wrapper" class="record_properties table table-condensed">
-            <tbody>
-                <tr>
-                    <td colspan="2">
-                        <a href="#">all</a> - 
-                        <a href="#">positive</a> - 
-                        <a href="#">negative</a> - 
-                        <a href="#">random</a>
+                        </table>
                     </td>
-                </tr>
-                <tr>                   
-                    <th>Created</th>
-                    <th>Message</th>
-                </tr>
+                </tr> 
+            </table>
+
+            <legend>Sentiments
+        {% if sentimentCount['positive'] == 0 and sentimentCount['negative'] == 0%}
+                    <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
+                        <i class="icon-screenshot"></i>
+                        Analyze Results
+                    </a>   
+        {%else%}
+                    <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
+                        <i class="icon-screenshot"></i>
+                        Analyze Results
+                    </a>   
+                    <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
+                        <i class="icon-remove-sign"></i>
+                        Remove sentiments
+                    </a>
+                </legend>
+                <div id="pie-graph">
+                    <img src="{{path('result_cake_graph', {search: entity.id } )}}" />
+                </div>
+         {%endif%}
+                <div id="loader">
+                    <img class="span2" src="{{asset('images/loader.gif')}}" />
+                </div>
+            </div>
+
+            <div id="results-right" class="span5 offset1">
+
+                <table id="wrapper" class="record_properties table table-condensed">
+                    <tbody>
+                        <tr>
+                            <td colspan="2">
+                                <a href="#">all</a> - 
+                                <a href="#">positive</a> - 
+                                <a href="#">negative</a> - 
+                                <a href="#">random</a>
+                            </td>
+                        </tr>
+                        <tr>                   
+                            <th>Created</th>
+                            <th>Message</th>
+                        </tr>
                 {%for key,entity in randomItems %}
                     {%if key < 20 %}
-                <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
-                    <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
-                    <td>{{ entity.message }}</td>
-                    </td>         
-                </tr>
+                        <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
+                            <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
+                            <td>{{ entity.message }}</td>
+                            </td>         
+                        </tr>
                    {%endif%}
            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    </tbody>
+                </table>
+            </div>
+ </div>
+{%else%}
+<p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
+{%endif%}
 
-    <script>              
-        
-        $('#loader').hide();
+        <script>                    
+                $('#loader').hide();
        
-        $('#analyzeResultsBtn').click(function()
-        {       
-            $.ajax({  
-            type: "POST",  
-            url: "{{path('result_analyze',{'search':entity.id} )}}",  
-            data: "",  
-            success: function(msg){
-               // $('#pie-graph').append('<img src="{{path('result_cake_graph', {search: entity.id } )}}" />');
-               window.location.reload();
-            }  
-             });  
+                $('#analyzeResultsBtn').click(function()
+                {       
+                    $.ajax({  
+                    type: "POST",  
+                    url: "{{path('result_analyze',{'search':entity.id} )}}",  
+                    data: "",  
+                    success: function(msg){
+                       // $('#pie-graph').append('<img src="{{path('result_cake_graph', {search: entity.id } )}}" />');
+                       window.location.reload();
+                    }  
+                     });  
         
-          });
+                  });
                    
-        $('#removeSentimentsBtn').click(function()
-        {       
-            $.ajax({  
-            type: "POST",  
-            url: "{{path('result_removeSentiments',{'search':entity.id} )}}",  
-            data: "",  
-            success: function(msg){
-                window.location.reload();
-            }  
-             });         
-          });
+                $('#removeSentimentsBtn').click(function()
+                {       
+                    $.ajax({  
+                    type: "POST",  
+                    url: "{{path('result_removeSentiments',{'search':entity.id} )}}",  
+                    data: "",  
+                    success: function(msg){
+                        window.location.reload();
+                    }  
+                     });         
+                  });
           
-          jQuery.ajaxSetup({
-           beforeSend: function() {
-               $('#pie-graph img').remove();
-               $('#analyzeResultsBtn').addClass('disabled');
-               $('#removeSentimentsBtn').addClass('disabled');
-               $('#loader').show();
-            },
-            complete: function(){
-               $('#analyzeResultsBtn').removeClass('disabled');
-               $('#removeSentimentsBtn').removeClass('disabled');
-               $('#loader').hide();
-            },
-            success: function() {}
-          });
+                  jQuery.ajaxSetup({
+                   beforeSend: function() {
+                       $('#pie-graph img').remove();
+                       $('#analyzeResultsBtn').addClass('disabled');
+                       $('#removeSentimentsBtn').addClass('disabled');
+                       $('#loader').show();
+                    },
+                    complete: function(){
+                       $('#analyzeResultsBtn').removeClass('disabled');
+                       $('#removeSentimentsBtn').removeClass('disabled');
+                       $('#loader').hide();
+                    },
+                    success: function() {}
+                  });
        
-        </script>    
+            </script>    
 
 {% endblock %}

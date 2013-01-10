@@ -118,27 +118,30 @@ class SearchController extends Controller
         {
             return $this->redirect($this->generateUrl('default_index'));
         }
-
+          
         $query = htmlspecialchars($_POST['query']);
         $em = $this->getDoctrine()->getManager();
-        $socialNetworks = $em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findAll();
         
-        $search = new Search();
-        $search->setName($query);
-        $search->setEndDate(new \DateTime());
-        
-        foreach($socialNetworks as $sn)
+        $search  = $em->getRepository('sonetrinDefaultBundle:Search')->findOneBy(array('name' => $query ));
+         
+        if(true === is_null($search))
         {
-           $search->setSocialNetwork($sn);
+            $socialNetworks = $em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findAll();        
+            $search = new Search();
+            $search->setName($query);
+            $search->setEndDate(new \DateTime());
+
+            foreach($socialNetworks as $sn)
+            {
+               $search->setSocialNetwork($sn);
+            }
+
+            $em->persist($search);
+            $em->flush();
         }
-        
-        $em->persist($search);
-        $em->flush();
-        
         return $this->redirect($this->generateUrl('search_collect', array('id' => $search->getId())));                  
     }
        
-
     /**
      * Displays a form to edit an existing Search entity.
      *
@@ -293,7 +296,7 @@ class SearchController extends Controller
     {    
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
-        $search->removeAllResults();
+//        $search->removeAllResults();
                
         foreach($search->getSocialNetwork() as $sn)
         {

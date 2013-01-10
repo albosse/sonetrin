@@ -12,6 +12,7 @@ use sonetrin\DefaultBundle\Entity\Item;
  */
 class GooglePlusModule implements SocialNetworkInterface
 {
+
     private $em;
     private $search;
     //json
@@ -36,11 +37,11 @@ class GooglePlusModule implements SocialNetworkInterface
      */
     public function findResults()
     {
-        if(true === $this->socialNetwork->getAuthRequired())
+        if (true === $this->socialNetwork->getAuthRequired())
         {
             $key = $this->socialNetwork->getApiKey();
         }
-        
+
         if (!isset($this->search))
         {
             throw new \Exception("No search available!");
@@ -57,11 +58,10 @@ class GooglePlusModule implements SocialNetworkInterface
             if ($item[0] == '#')
             {
                 $query .= '%23' . str_replace('#', '', $item);
-            }elseif ($item[0] == '@')
+            } elseif ($item[0] == '@')
             {
                 $query .= '%40' . str_replace('#', '', $item);
-            }  
-            else
+            } else
             {
                 $query .= '' . $item;
             }
@@ -78,10 +78,10 @@ class GooglePlusModule implements SocialNetworkInterface
         {
             $url = $this->socialNetwork->getUrl() .
                     $query;
-                    //                    '&lang=' . $this->lang .
-                    //                    '&until=' . $until .
+            //                    '&lang=' . $this->lang .
+            //                    '&until=' . $until .
 //                    '&maxResults=100' . 
-            if(isset($key))
+            if (isset($key))
             {
                 $url .= '&key=' . $key;
             }
@@ -100,7 +100,7 @@ class GooglePlusModule implements SocialNetworkInterface
 
             $this->results_raw[] = $result;
 
-            $nextPageToken = isset($result->nextPageToken) ? $result->nextPageToken :'' ;
+            $nextPageToken = isset($result->nextPageToken) ? $result->nextPageToken : '';
         }
 
         $this->results_raw = array_values($this->results_raw);
@@ -112,20 +112,36 @@ class GooglePlusModule implements SocialNetworkInterface
 
     public function processResults()
     {
-        if (false === is_null($this->results_raw))
+        if (true === is_null($this->results_raw))
+        {
+            return false;
+        }
+
+        $old_res = $this->em->getRepository('sonetrinDefaultBundle:Result')
+                ->findOneBy(array('search' => $this->search, 'socialNetwork' => $this->socialNetwork));
+
+
+        if (false === is_null($old_res))
+        {
+            $result_model = $old_res;
+        } else
         {
             $result_model = new Result();
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
-            
-            foreach ($this->results_raw as $results)
+
+        }
+        $itemCount = 0;
+        foreach ($this->results_raw as $results)
+        {
+            foreach ($results->items as $tweet)
             {
-                foreach ($results->items as $tweet)
+                $itemCount = count($results->items);
+                $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
+                        ->findOneBy(array('message_id' => $tweet->id));
+
+                if (('' != strip_tags($tweet->object->content) && (true === is_null($item_exists))))
                 {
-                    if ('' == strip_tags($tweet->object->content))
-                    {
-                        continue;
-                    }
                     $item = new Item();
                     $item->setAuthor($tweet->actor->displayName);
                     $item->setCreated(new \DateTime($tweet->published));
@@ -133,11 +149,18 @@ class GooglePlusModule implements SocialNetworkInterface
                     $item->setMessage_id($tweet->id);
                     $item->setResult($result_model);
                     $result_model->addItem($item);
+                    $itemCount++;
                 }
             }
         }
-
-        $this->em->persist($result_model);
-        $this->em->flush();
+        
+        if($itemCount > 0)
+        {
+           $this->em->persist($result_model);
+        }
+        
+       $this->em->flush();
     }
+
 }
+
