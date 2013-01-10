@@ -20,7 +20,7 @@ class GooglePlusModule implements SocialNetworkInterface
     //array with date:user:text
     private $lang = 'en';
     private $socialNetwork;
-    private $maxResults = 100;
+    private $maxResults = 20;
     private $cycles = 20;
 
     public function __construct($em, Search $search)
@@ -78,9 +78,9 @@ class GooglePlusModule implements SocialNetworkInterface
         {
             $url = $this->socialNetwork->getUrl() .
                     $query;
-            //                    '&lang=' . $this->lang .
+             $url .= '&lang=' . $this->lang .
             //                    '&until=' . $until .
-//                    '&maxResults=100' . 
+            $url .= '&maxResults=' . $this->maxResults;
             if (isset($key))
             {
                 $url .= '&key=' . $key;
@@ -112,6 +112,9 @@ class GooglePlusModule implements SocialNetworkInterface
 
     public function processResults()
     {
+        $newResult = false;
+         
+         
         if (true === is_null($this->results_raw))
         {
             return false;
@@ -119,13 +122,14 @@ class GooglePlusModule implements SocialNetworkInterface
 
         $old_res = $this->em->getRepository('sonetrinDefaultBundle:Result')
                 ->findOneBy(array('search' => $this->search, 'socialNetwork' => $this->socialNetwork));
-
+        
 
         if (false === is_null($old_res))
         {
             $result_model = $old_res;
         } else
         {
+            $newResult = true;
             $result_model = new Result();
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
@@ -138,7 +142,7 @@ class GooglePlusModule implements SocialNetworkInterface
             {
                 $itemCount = count($results->items);
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
-                        ->findOneBy(array('message_id' => $tweet->id));
+                        ->findOneBy(array('message_id' => $tweet->id, 'search' => $this->search));
 
                 if (('' != strip_tags($tweet->object->content) && (true === is_null($item_exists))))
                 {
@@ -148,13 +152,16 @@ class GooglePlusModule implements SocialNetworkInterface
                     $item->setMessage(strip_tags($tweet->object->content));
                     $item->setMessage_id($tweet->id);
                     $item->setResult($result_model);
+                    $item->setSearch($this->search);
+//                    $this->em->persist($item);
+                    
                     $result_model->addItem($item);
                     $itemCount++;
                 }
             }
         }
         
-        if($itemCount > 0)
+        if($itemCount > 0 && $newResult == true)
         {
            $this->em->persist($result_model);
         }

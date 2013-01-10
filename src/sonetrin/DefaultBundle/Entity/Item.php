@@ -4,6 +4,7 @@ namespace sonetrin\DefaultBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use sonetrin\DefaultBundle\Entity\Result;
+use sonetrin\DefaultBundle\Entity\Search;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -66,6 +67,23 @@ class Item
     private $result;
     
     /**
+     * @var Result result
+     * 
+     * @ORM\ManyToOne(targetEntity="Search")
+     */
+    private $search;
+    
+    public function getSearch()
+    {
+        return $this->search;
+    }
+
+    public function setSearch(Search $search)
+    {
+        $this->search = $search;
+    }
+
+        /**
      * Get id
      *
      * @return integer 

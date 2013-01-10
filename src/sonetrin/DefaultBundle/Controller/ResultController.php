@@ -18,38 +18,55 @@ class ResultController extends Controller
     /**
      * Displays the results for a specific sesrch
      * 
-     * @Route("/{search}", name="result", requirements={"search" = "\d+"})
+     * @Route("/{search}/{filter}", name="result", requirements={"search" = "\d+"}, defaults={"filter" = false})
      * @Template()
      */
-    public function indexAction(Search $search)
+    public function indexAction(Search $search, $filter)
     {
         $em = $this->getDoctrine()->getManager();
-        $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search);
+        $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search,$filter);
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());
         
         return array('entity' => $search, 'randomItems' => $randomItems, 'sentimentCount' => $sentimentCount);
     }
 
     /**
-     * @Route("/{id}/show/{count}", name="result_show", requirements={"id" = "\d+"}, defaults={"count" = 50})
+     * @Route("/show/{id}/limit/{count}/{filter}", name="result_show", requirements={"id" = "\d+"}, defaults={"count" = 50, "filter" = false})
      * @Template()
      */
-    public function showAction(Result $id, $count)
+    public function showAction(Result $id, $count, $filter)
     {
         $em = $this->getDoctrine()->getManager();
+            
         $result = $em->getRepository('sonetrinDefaultBundle:Result')->find($id->getId());
-
-
-        if ($count > count($result->getItem()))
+        
+        if($filter == 'positive' || $filter == 'negative')
         {
-            $count = count($result->getItem());
+            $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId(),'sentiment' => $filter));
         }
-        return array('result' => $result,
-            'count' => $count);
+        else
+        {
+             $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId()));
+        }
+        
+        if($filter == 'random')
+        {
+            shuffle($items);
+        }
+        
+        $countItems = count($items);
+        if ($count > $countItems)
+        {
+            $count = $countItems;
+        }
+
+        return array('entity' => $result,
+                     'items' => $items,
+                      'count' => $count);
     }
 
     /**
-     * @Route("/{id}/delete", name="result_delete", requirements={"id" = "\d+"})
+     * @Route("/delete/{id}", name="result_delete", requirements={"id" = "\d+"})
      * @Template()
      */
     public function deleteAction(Result $id)

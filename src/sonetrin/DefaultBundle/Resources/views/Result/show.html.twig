@@ -3,48 +3,56 @@
 
 <ul class="breadcrumb">
     <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
-    <li><a href="{{path('result',{'search':result.search.id})}}">Results</a> <span class="divider">/</span></li>
+    <li><a href="{{path('result',{'search':entity.search.id})}}">Results</a> <span class="divider">/</span></li>
     <li class="active">Show</li>
 </ul>
 
 <header class="jumbotron subhead" id="overview">
     <div class="container">
         <h1>{{ 'Show Results'|trans }}</h1>
-        <p class="lead">Take a look inside the saved entries for "{{result.search.name}}"...</p>
+        <p class="lead">Take a look inside the saved entries for "{{entity.search.name}}"...</p>
     </div>
 </header>
 <hr />
 
- <p>Displaying entries 1-{{count}} / {{result.item|length}}</p> 
+ <p>Displaying entries 1-{{count}} / {{items|length}}</p> 
 
-<table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
+<table id="wrapper" class="record_properties table table-bordered table-condensed">
     <tbody>
+        <tr>
+           <td colspan="4">
+               <a href="{{path('result_show',{'id' : entity.id})}}">all</a> - 
+               <a id="positive-filter" href="{{path('result_show',{'id' : entity.id,'count' : count, 'filter' : 'positive'})}}">positive</a> - 
+               <a id="negative-filter" href="{{path('result_show',{'id' : entity.id,'count' : count, 'filter' : 'negative'})}}">negative</a> - 
+               <a href="{{path('result_show',{'id' : entity.id, 'count' : count, 'filter' : 'random'})}}">random</a>
+           </td>
+       </tr>
+                        
         <tr>
             <th>#</th>
             <th>Date</th>
             <th>Message</th>
-            <th>Sentiment</th>
         </tr>
-
-        {%for key,entity in result.item %}
-        {%if key < count %}
-        <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
-            <td>{{key+1}}</td>
-            <td style="white-space: nowrap;">{{ entity.created| date('Y-m-d') }}</td>
-            <td>{{ entity.message }}</td>
-            <td>
-                <div class="action-list">
-                    <a href="#"><img src="{{ asset('images/icons/smiley_angry.png') }}" title="Negative" alt="Negative" class="action-inactive" /></a>
-                    <a href="#"><img src="{{ asset('images/icons/smiley_in_love.png') }}" title="Positive" alt="Positive" class="action-inactive" /></a>
-            </td>
-            </div>
-        </tr>
+        
+        {%for key,entity in items %}
+            {%if key < count %}
+            <tr>
+                <td>{{key+1}}</td>
+                <td style="white-space: nowrap;">{{ entity.created| date('Y-m-d') }}</td>
+                <td {%if entity.sentiment == 'positive'%}
+                    class="positive-row" 
+                    {%elseif entity.sentiment == 'negative'%} 
+                    class="negative-row" 
+                    {%endif%}>{{ entity.message }}
+                </td>
+                </div>
+             </tr>
             {%endif%}
         {%endfor%}
 
-        {%if  result.item %}
+        {%if entity %}
         <tr>
-            <td colspan="3"><a href="{{ path('result_show', { 'id': result.id,'count':count+20 }) }}">Show 20 more results</a></td>
+            <td colspan="3"><a href="{{ path('result_show', { 'id': entity.id,'count':count+20 }) }}">Show 20 more results</a></td>
         </tr>   
         {%endif%}
     </tbody>

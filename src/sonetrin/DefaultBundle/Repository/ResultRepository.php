@@ -13,7 +13,6 @@ use sonetrin\DefaultBundle\Entity\Search;
  */
 class ResultRepository extends EntityRepository
 {
-
     public function findRecordsSentiments($searchId)
     {
         $sentiments = array('positive' => 0, 'negative' => 0, 'neutral' => 0);

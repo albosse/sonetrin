@@ -67,7 +67,6 @@ class TwitterModule implements SocialNetworkInterface
             }
         }
 
-
         try
         {
             $until = $this->search->getEndDate()->format('Y-m-d');
@@ -97,20 +96,21 @@ class TwitterModule implements SocialNetworkInterface
 
     public function processResults()
     {
+        $newResult = false;
+        
         if (true === is_null($this->results_raw))
         {
             return false;
         }
 
-        $old_res = $this->em->getRepository('sonetrinDefaultBundle:Result')
-                ->findOneBy(array('search' => $this->search, 'socialNetwork' => $this->socialNetwork));
+        $result_model = $this->em->getRepository('sonetrinDefaultBundle:Result')
+                ->findOneBy(array('search' => $this->search, 
+                    'socialNetwork' => $this->socialNetwork));
 
-
-        if (false === is_null($old_res))
+        if (is_null($result_model))
         {
-            $result_model = $old_res;
-        } else
-        {
+            $newResult = true;
+            
             $result_model = new Result();
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
@@ -122,27 +122,25 @@ class TwitterModule implements SocialNetworkInterface
             foreach ($result->results as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
-                        ->findOneBy(array('message_id' => $tweet->id_str));
-
-                if (true === is_null($item_exists))
-                {
+                        ->findOneBy(array('message_id' => $tweet->id_str, 'search' => $this->search));
+                               
+                if (true == is_null($item_exists))
+                {     
                     $item = new Item();
                     $item->setAuthor($tweet->from_user);
                     $item->setCreated(new \DateTime($tweet->created_at));
                     $item->setMessage($tweet->text);
                     $item->setMessage_id($tweet->id_str);
                     $item->setResult($result_model);
+                    $item->setSearch($this->search);
                     $result_model->addItem($item);
                     $itemCount++;
                 }
             }
         }
 
-        if ($itemCount > 0)
-        {
-            $this->em->persist($result_model);
-        }
-
+        $this->em->persist($result_model);
+        
         $this->em->flush();
 
         return true;

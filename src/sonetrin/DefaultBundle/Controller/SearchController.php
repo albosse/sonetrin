@@ -267,7 +267,7 @@ class SearchController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
-        $search->removeAllResults();
+//        $search->removeAllResults();
         
         foreach($search->getSocialNetwork() as $sn)
         {

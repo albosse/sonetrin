@@ -12,19 +12,16 @@ use sonetrin\DefaultBundle\Entity\Search;
  * @Route("/analysis")
  */
 class AnalysisController extends Controller
-{
-    
+{   
      /**
      * @Route("/cake/{search}", name="result_cake_graph")
-     * 
      */
     public function cakeAction(Search $search)
     {
         $em = $this->getDoctrine()->getManager();
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')
                 ->findRecordsSentiments($search->getId());
-        
-        
+              
         include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
         include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
 
@@ -51,6 +48,8 @@ class AnalysisController extends Controller
 
         $graph->Add($p1);
         $graph->Stroke();
+        
+        return array();
     }
 
     /**
@@ -107,6 +106,64 @@ class AnalysisController extends Controller
         $graph->SetShadow();
 
         // Grafik anzeigen
-        $graph->Stroke();
+        $graph->Stroke();      
     }
+    
+    /**
+     * @Route("/bar/{search}/{scale}", name="result_bar_graph", defaults={"scale" = "month"})
+     * @Template()
+     */
+    public function showBarGraphAction(Search $search, $scale)
+    {
+       include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
+       include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_bar.php");
+        
+       $em = $this->getDoctrine()->getManager();
+       $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Item')
+                ->findSentimentsForBarGraph($search, $scale);
+        
+        foreach($sentimentCount as $date)
+        {
+            $datay1[] = $date['positive'];
+            $datay2[] = $date['negative'];
+            $datay3[] = $date['neutral'];
+        }   
+      
+        $graph = new \Graph(500,300,'auto');    
+        $graph->ClearTheme();
+        $graph->SetFrame(false);
+        $graph->SetScale("textlin");
+        $graph->SetShadow();
+        $graph->img->SetMargin(40,30,40,40);
+        $graph->xaxis->SetTickLabels(array_keys($sentimentCount));
+
+//        $graph->xaxis->title->Set('Year ' . $search->getCreatedAt()->format('Y'));
+        $graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
+
+//        $graph->title->Set('Group bar plot');
+        $graph->title->SetFont(FF_FONT1,FS_BOLD);
+                  
+        $bplot1 = new \BarPlot($datay1);
+        $bplot2 = new \BarPlot($datay2);
+        $bplot3 = new \BarPlot($datay3);
+
+        $bplot1->SetFillColor("#CCF5CC");
+        $bplot2->SetFillColor("#FFB2B2");
+        $bplot3->SetFillColor("#EDEDF3");
+
+        $bplot1->SetShadow();
+        $bplot2->SetShadow();
+        $bplot3->SetShadow();
+
+        $bplot1->SetShadow();
+        $bplot2->SetShadow();
+        $bplot3->SetShadow();
+
+        $gbarplot = new \GroupBarPlot(array($bplot1,$bplot2,$bplot3));
+        $gbarplot->SetWidth(0.6);
+        $graph->Add($gbarplot);
+
+        $graph->Stroke();
+         return array();
+    }  
 }

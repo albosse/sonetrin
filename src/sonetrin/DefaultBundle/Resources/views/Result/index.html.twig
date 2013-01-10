@@ -20,9 +20,6 @@
         <table class="table span5">
             <legend>Search Information</legend>
             <tr>
-                <td class="label-cell">Interval:</td><td>{{entity.startDate|date('Y-m-d')}} - {{entity.endDate|date('Y-m-d')}}</td>
-            </tr>
-            <tr>
                 <td class="label-cell">Social Networks:</td>
                 <td>
                     <table class="result-list">
@@ -66,8 +63,18 @@
                     </a>
                 </legend>
                 <div id="pie-graph">
-                    <img src="{{path('result_cake_graph', {search: entity.id } )}}" />
+                    <img src="{{path('result_cake_graph', {'search': entity.id } )}}" />
                 </div>
+
+                <div id="bar-graph">
+                    <select id="bar-scale" class="span2">
+                        <option>Day</option>
+                        <option selected="selected">Month</option>
+                        <option>Year</option>
+                    </select>
+                    <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
+                </div>  
+
          {%endif%}
                 <div id="loader">
                     <img class="span2" src="{{asset('images/loader.gif')}}" />
@@ -75,39 +82,55 @@
             </div>
 
             <div id="results-right" class="span5 offset1">
-
                 <table id="wrapper" class="record_properties table table-condensed">
                     <tbody>
                         <tr>
                             <td colspan="2">
-                                <a href="#">all</a> - 
-                                <a href="#">positive</a> - 
-                                <a href="#">negative</a> - 
-                                <a href="#">random</a>
+                                <a href="{{path('result',{'search' : entity.id})}}">all</a> - 
+                                <a id="positive-filter" href="{{path('result',{'search' : entity.id, 'filter' : 'positive'})}}">positive</a> - 
+                                <a id="negative-filter" href="{{path('result',{'search' : entity.id, 'filter' : 'negative'})}}">negative</a> - 
+                                <a href="{{path('result',{'search' : entity.id, 'filter' : 'random'})}}">random</a>
                             </td>
                         </tr>
                         <tr>                   
                             <th>Created</th>
                             <th>Message</th>
                         </tr>
-                {%for key,entity in randomItems %}
-                    {%if key < 20 %}
+                            {%for key,entity in randomItems %}
+                                {%if key < 20 %}
                         <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
                             <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
                             <td>{{ entity.message }}</td>
                             </td>         
                         </tr>
-                   {%endif%}
-           {% endfor %}
+                               {%endif%}
+                            {% endfor %}        
                     </tbody>
                 </table>
             </div>
- </div>
+        </div>
 {%else%}
-<p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
+        <p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
 {%endif%}
 
-        <script>                    
+        <script>        
+
+                $('#bar-scale').change(function() 
+                {                   
+                     $('#bar-graph-image').fadeOut();
+                    if( $('#bar-scale option:selected').text() == 'Month'){  
+                        $('#bar-graph-image').attr('src',"{{path('result_bar_graph',{'search':entity.id, 'scale': 'month'} )}}");
+                    }
+                    else if($('#bar-scale option:selected').text() == 'Day'){
+                       $('#bar-graph-image').attr("src", "{{path('result_bar_graph',{'search':entity.id, 'scale': 'day'} )}}");
+                     }
+                    else if($('#bar-scale option:selected').text() == 'Year'){
+                        $('#bar-graph-image').attr("src", "{{path('result_bar_graph',{'search':entity.id, 'scale': 'year'} )}}");
+                     }
+                      $('#bar-graph-image').fadeIn();
+                                      
+                });
+                
                 $('#loader').hide();
        
                 $('#analyzeResultsBtn').click(function()
@@ -117,7 +140,7 @@
                     url: "{{path('result_analyze',{'search':entity.id} )}}",  
                     data: "",  
                     success: function(msg){
-                       // $('#pie-graph').append('<img src="{{path('result_cake_graph', {search: entity.id } )}}" />');
+                       // $('#pie-graph').append('<img src="{{path('result_cake_graph', {'search': entity.id } )}}" />');
                        window.location.reload();
                     }  
                      });  
@@ -150,6 +173,9 @@
                     },
                     success: function() {}
                   });
+       
+       
+                  
        
             </script>    
 
