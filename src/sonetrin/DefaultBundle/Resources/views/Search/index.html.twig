@@ -8,8 +8,7 @@
   </div>
 </header>
 <hr />
-
-<table class="records_list table table-bordered table-condensed table-striped">
+<table id="search-list" class="records_list table table-bordered table-condensed table-striped">
     <thead>
         <tr>
             <th>{{ 'Id'|trans }}</th>
@@ -33,21 +32,20 @@
             <td>{% if entity.startDate %}{{ entity.startDate|date('Y-m-d') }}{% endif %}</td>
             <td>{% if entity.endDate %}{{ entity.endDate|date('Y-m-d') }}{% endif %}</td>
             <td>
-               
+               {#
                {% if entity.hasResult  %} 
                  <a class="btn btn-mini btn-success" href="#modal{{entity.id}}" data-toggle="modal" >
                      <i class="icon-step-forward"></i>
                     {{ 'start'|trans }}
                 </a>
                {%else%}
-                <a class="btn btn-mini btn-success" href="{{ path('search_run', { 'id': entity.id }) }}">
+                #}
+                <a id="run_search_btn-{{entity.id}}" class="btn btn-mini btn-success" href="{{path('search_collect', {'id' : entity.id} )}}" >
                      <i class="icon-step-forward"></i>
                     {{ 'start'|trans }}
                  </a>
-               {%endif%} 
-                 
-                    
-                    
+               {#{%endif%} #}
+                                          
                 <a class="btn btn-mini" href="{{ path('search_show', { 'id': entity.id }) }}">
                     <i class="icon-eye-open"></i>
                     {{ 'show'|trans }}
@@ -64,11 +62,12 @@
                 {% if entity.hasResult() %}
                     <a class="btn btn-mini btn-info" href="{{ path('result', { 'search': entity.id }) }}">
                         <i class="icon-tasks"></i>
-                        {{ 'Results'|trans }}
+                        {{ 'results'|trans }}
                     </a>   
                 {% endif%}
             </td>
         </tr>
+        {#
         {%if entity.hasResult%}
         <!-- Modal -->
             <div id="modal{{entity.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -83,15 +82,16 @@
               </div>
               <div class="modal-footer">
                 <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <a href="{{ path('search_run', { 'id': entity.id }) }}" class="btn btn-primary">Start a new Search</a>
+                <a id="run_search_btn-{{entity.id}}" href="#" class="btn btn-primary">Start a new Search</a>
               </div>
             </div>
-        {%endif%}
+        {%endif%} 
+        #}       
     {% endfor %}
     </tbody>
 </table>
 
-<a class="btn" href="{{ path('search_new') }}">
+<a id="new-search-btn" class="btn" href="{{ path('search_new') }}">
     <i class="icon-plus"></i>
     {{ 'create a new entry'|trans }}
 </a>

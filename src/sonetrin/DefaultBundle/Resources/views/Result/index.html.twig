@@ -8,22 +8,16 @@
 
 <header class="jumbotron subhead" id="overview">
     <div class="container">
-        <h1>{{ 'Results'|trans }}</h1>
-        <p class="lead">The first step is done! Now choose your desired graphs and bars!</p>
+        <h1>{{ 'Results'|trans }} for {{entity.name}} </h1>
     </div>
 </header>
 <hr />
 <div id="results-left" class="span5">
 
     <table class="table span5">
+        <legend>Search Information</legend>
         <tr>
-            <td class="label-cell">Query for:</td><td>{{entity.name}}</td>
-        </tr>  
-        <tr>
-            <td class="label-cell">Since:</td><td>{{entity.startDate|date('Y-m-d')}}</td>
-        </tr>
-        <tr>
-            <td class="label-cell">Until:</td><td>{{entity.endDate|date('Y-m-d')}}</td>
+            <td class="label-cell">Interval:</td><td>{{entity.startDate|date('Y-m-d')}} - {{entity.endDate|date('Y-m-d')}}</td>
         </tr>
         <tr>
             <td class="label-cell">Social Networks:</td>
@@ -50,43 +44,107 @@
                     </table>
                 </td>
             </tr> 
-            <tr>
-                <td class="label-cell">Sentiments:</td>
-                <td class="span9">
-                    <img src="{{path('result_cake_graph')}}" />
-                </td>
-            </tr>
         </table>
+        
+        <legend>Sentiments
+        {% if sentimentCount['positive'] == 0 and sentimentCount['negative'] == 0%}
+        <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
+            <i class="icon-screenshot"></i>
+            Analyze Results
+        </a>   
+        {%else%}
+        <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
+            <i class="icon-screenshot"></i>
+            Analyze Results
+        </a>   
+            <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
+                <i class="icon-remove-sign"></i>
+                Remove sentiments
+            </a>
+         </legend>
+        <div id="pie-graph">
+            <img src="{{path('result_cake_graph', {search: entity.id } )}}" />
+        </div>
+         {%endif%}
+       <div id="loader">
+            <img class="span2" src="{{asset('images/loader.gif')}}" />
+        </div>
     </div>
 
     <div id="results-right" class="span5 offset1">
 
-          <table id="wrapper" class="record_properties table table-bordered table-condensed table-striped">
+        <table id="wrapper" class="record_properties table table-condensed">
             <tbody>
                 <tr>
+                    <td colspan="2">
+                        <a href="#">all</a> - 
+                        <a href="#">positive</a> - 
+                        <a href="#">negative</a> - 
+                        <a href="#">random</a>
+                    </td>
+                </tr>
+                <tr>                   
                     <th>Created</th>
                     <th>Message</th>
-                    <th>Sentiment</th>
                 </tr>
-             {% for result in entity.result %}
-                {%for key,entity in result.item %}
+                {%for key,entity in randomItems %}
                     {%if key < 20 %}
-                        <tr>
-                            <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
-                            <td>{{ entity.message }}</td>
-                            <td>
-                                <div class="action-list">
-                                    <a href="#"><img src="{{ asset('images/icons/smiley_angry.png') }}" title="Negative" alt="Negative" class="action-inactive" /></a>
-                                    <a href="#"><img src="{{ asset('images/icons/smiley_in_love.png') }}" title="Positive" alt="Positive" class="action-inactive" /></a>                       
-                              </div>
-                            </td>         
-                        </tr>
+                <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
+                    <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
+                    <td>{{ entity.message }}</td>
+                    </td>         
+                </tr>
                    {%endif%}
-              {%endfor%}
            {% endfor %}
             </tbody>
         </table>
     </div>
 
+    <script>              
+        
+        $('#loader').hide();
+       
+        $('#analyzeResultsBtn').click(function()
+        {       
+            $.ajax({  
+            type: "POST",  
+            url: "{{path('result_analyze',{'search':entity.id} )}}",  
+            data: "",  
+            success: function(msg){
+               // $('#pie-graph').append('<img src="{{path('result_cake_graph', {search: entity.id } )}}" />');
+               window.location.reload();
+            }  
+             });  
+        
+          });
+                   
+        $('#removeSentimentsBtn').click(function()
+        {       
+            $.ajax({  
+            type: "POST",  
+            url: "{{path('result_removeSentiments',{'search':entity.id} )}}",  
+            data: "",  
+            success: function(msg){
+                window.location.reload();
+            }  
+             });         
+          });
+          
+          jQuery.ajaxSetup({
+           beforeSend: function() {
+               $('#pie-graph img').remove();
+               $('#analyzeResultsBtn').addClass('disabled');
+               $('#removeSentimentsBtn').addClass('disabled');
+               $('#loader').show();
+            },
+            complete: function(){
+               $('#analyzeResultsBtn').removeClass('disabled');
+               $('#removeSentimentsBtn').removeClass('disabled');
+               $('#loader').hide();
+            },
+            success: function() {}
+          });
+       
+        </script>    
 
 {% endblock %}

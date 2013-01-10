@@ -44,21 +44,21 @@ class Search
     /**
      * @var \DateTime $startDate
      *
-     * @ORM\Column(name="startDate", type="date")
+     * @ORM\Column(name="startDate", type="date", nullable=true)
      */
     private $startDate;
 
     /**
      * @var \DateTime $endDate
      *
-     * @ORM\Column(name="endDate", type="date")
+     * @ORM\Column(name="endDate", type="date", nullable=true)
      */
     private $endDate;
 
     /**
      * @var boolean $semantic
      *
-     * @ORM\Column(name="semantic", type="boolean")
+     * @ORM\Column(name="semantic", type="boolean", nullable=true)
      */
     private $semantic;
 

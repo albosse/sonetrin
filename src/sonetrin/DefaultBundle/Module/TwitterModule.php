@@ -67,7 +67,7 @@ class TwitterModule implements SocialNetworkInterface
             }
         }
 
-//die(var_dump($query));
+
 
         $until = $this->search->getEndDate()->format('Y-m-d');
 
@@ -78,6 +78,9 @@ class TwitterModule implements SocialNetworkInterface
                     '&lang=' . $this->lang .
                     '&until=' . $until .
                     '&rpp=' . $this->rpp;
+            
+//            die(var_dump($url));
+            
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

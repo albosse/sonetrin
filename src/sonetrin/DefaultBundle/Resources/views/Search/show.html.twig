@@ -31,7 +31,7 @@
                 <ul>
                {%for result in entity.result %}
                    <li>
-                   {{ result.createdAt|date('Y-m-d') }} | {{ result.socialNetwork.name }} |  {{ result.entriesCount }} entries
+                   {{ result.createdAt|date('Y-m-d') }} | {{ result.socialNetwork.name }} |  {{ result.item|length }} entries
                    </li>
                {%endfor%}
                 </ul>        

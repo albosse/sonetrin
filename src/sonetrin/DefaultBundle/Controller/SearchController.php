@@ -18,7 +18,6 @@ use sonetrin\DefaultBundle\Module\GooglePlusModule;
  */
 class SearchController extends Controller
 {
-
     /**
      * Lists all Search entities.
      *
@@ -107,6 +106,38 @@ class SearchController extends Controller
             'form' => $form->createView(),
         );
     }
+    
+     /**
+     * Creates a new Search entity.
+     *
+     * @Route("/createShort", name="search_shortQuery")
+     */
+    public function createShortQueryAction()
+    {
+        if(false === isset($_POST['query']))
+        {
+            return $this->redirect($this->generateUrl('default_index'));
+        }
+
+        $query = htmlspecialchars($_POST['query']);
+        $em = $this->getDoctrine()->getManager();
+        $socialNetworks = $em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findAll();
+        
+        $search = new Search();
+        $search->setName($query);
+        $search->setEndDate(new \DateTime());
+        
+        foreach($socialNetworks as $sn)
+        {
+           $search->setSocialNetwork($sn);
+        }
+        
+        $em->persist($search);
+        $em->flush();
+        
+        return $this->redirect($this->generateUrl('search_collect', array('id' => $search->getId())));                  
+    }
+       
 
     /**
      * Displays a form to edit an existing Search entity.
@@ -212,6 +243,17 @@ class SearchController extends Controller
                         ->getForm()
         ;
     }
+    
+     /**
+     * Search networks for the created query.
+     *
+     * @Route("/collect/{id}", name="search_collect", requirements={"id" = "\d+"})
+     * @Template()
+     */
+    public function collectAction(Search $id)
+    {      
+        return array('entity' => $id);      
+    }
 
     /**
      * Search networks for the created query.
@@ -240,6 +282,39 @@ class SearchController extends Controller
         //Get new search entity with new results
         $em->refresh($search);
         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+    }
+    
+     /**
+     * Search networks for the created query with ajax.
+     *
+     * @Route("/run_ajax/{id}", name="search_runAjax", requirements={"id" = "\d+"})
+     */
+    public function runAjaxAction($id)
+    {    
+        $em = $this->getDoctrine()->getManager();
+        $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
+        $search->removeAllResults();
+               
+        foreach($search->getSocialNetwork() as $sn)
+        {
+            switch($sn->getName())
+            {
+                case 'twitter':
+                   $status = $this->getTwitterResults($search);    
+                break;  
+                case 'googleplus':
+                   $status = $this->getGooglePlusResults($search);
+                break;
+            }
+        }
+        
+        //analyze new results
+//        $c = new ResultController();
+        $em->refresh($search);
+//        $c->analyzeResultsAction($search);
+        
+        //Get new search entity with new results
+        return $this->redirect($this->generateUrl('result_analyze', array('search' => $search->getId())));  
     }
 
     private function getTwitterResults($search)

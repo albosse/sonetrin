@@ -11,7 +11,7 @@ use sonetrin\DefaultBundle\Entity\SocialNetwork;
  * sonetrin\DefaultBundle\Entity\Result
  *
  * @ORM\Table(name="result")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="sonetrin\DefaultBundle\Repository\ResultRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class Result

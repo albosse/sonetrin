@@ -6,24 +6,55 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Core\SecurityContext;
+use sonetrin\DefaultBundle\Entity\Search;
 
 /**
  * @Route("/analysis")
  */
 class AnalysisController extends Controller
 {
-
-    /**
-     * @Route("/", name="analysis_index")
-     * @Template()
+    
+     /**
+     * @Route("/cake/{search}", name="result_cake_graph")
+     * 
      */
-    public function indexAction()
+    public function cakeAction(Search $search)
     {
-        return array();
+        $em = $this->getDoctrine()->getManager();
+        $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')
+                ->findRecordsSentiments($search->getId());
+        
+        
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
+
+        $data = array($sentimentCount['positive'],
+            $sentimentCount['negative'],
+            $sentimentCount['neutral']);
+
+        $graph = new \PieGraph(400, 400);
+        $graph->ClearTheme();
+        $graph->SetShadow();
+        $graph->SetFrame(false);
+        $graph->SetMargin(10,10,10,10);
+        $graph->title->SetFont(FF_FONT1, FS_BOLD, 20);     
+        $graph->legend->SetPos(0.5, 0.8, 'center', 'bottom');
+        $graph->legend->SetColumns(3);
+        $graph->legend->SetFont(FF_FONT1, FS_BOLD, 24);
+
+        $p1 = new \PiePlot($data);
+        $p1->SetLegends(array('positive', 'negative', 'neutral'));
+        $p1->SetSliceColors(array('#CCF5CC','#FFB2B2','#EDEDF3'));  
+//        $p1->SetSize(0.3);
+        $p1->SetCenter(0.5, 0.35);
+
+
+        $graph->Add($p1);
+        $graph->Stroke();
     }
 
     /**
-     * @Route("/analysis/line", name="analysis_line_graph")
+     * @Route("/line/{search}", name="result_line_graph")
      * 
      */
     public function showLineGraph()
@@ -78,30 +109,4 @@ class AnalysisController extends Controller
         // Grafik anzeigen
         $graph->Stroke();
     }
-
-    /**
-     * @Route("/analysis/cake", name="analysis_cake_graph")
-     * 
-     */
-    public function cake()
-    {
-        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
-        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
-
-        $data = array(10, 50, 30, 10);
-
-        $graph = new \PieGraph(300, 200, "auto");
-        $graph->SetShadow();
-
-        $graph->title->Set("A simple Pie plot");
-        $graph->title->SetFont(FF_FONT1, FS_BOLD);
-
-        $p1 = new \PiePlot($data);
-        $p1->SetLegends($gDateLocale->GetShortMonth());
-        $p1->SetCenter(0);
-
-        $graph->Add($p1);
-        $graph->Stroke();
-    }
-
 }

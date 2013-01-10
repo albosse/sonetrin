@@ -28,7 +28,7 @@
 
         {%for key,entity in result.item %}
         {%if key < count %}
-        <tr>
+        <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
             <td>{{key+1}}</td>
             <td style="white-space: nowrap;">{{ entity.created| date('Y-m-d') }}</td>
             <td>{{ entity.message }}</td>

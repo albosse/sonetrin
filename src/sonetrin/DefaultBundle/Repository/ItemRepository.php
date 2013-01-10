@@ -14,19 +14,27 @@ use sonetrin\DefaultBundle\Entity\Search;
 class ItemRepository extends EntityRepository
 {
 
-    public function findAllItemsBySearch(Search $search)
+    public function findAllItemsBySearch(Search $search, $limit = false)
     {
+        $results = $search->getResult();
         $items = array();
-        
-        foreach ($search->getResult() as $result)
+
+        foreach ($results as $result)
         {
-            $query = $this->createQueryBuilder('i')
-                    ->where('i.result = :id')
-                    ->setParameter('id', $result->getId())
-                    ->getQuery();
-            $items[] = $query->getResult();
+            $query = $this->createQueryBuilder('r');
+            $query->where('r.result = :id');
+            $query->setParameter('id', $result->getId());
+
+            if ($limit != false)
+            {
+                $query->setMaxResults($limit);
+            }
+
+            $items = array_merge($items, $query->getQuery()->getResult());
         }
-        return $items;
+        $array = ($items);
+
+        return $array;
     }
 
 }

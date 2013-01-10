@@ -1,0 +1,45 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+
+<header class="jumbotron subhead" id="overview">
+  <div class="container">
+    <h1>{{ 'Collecting Results'|trans }}</h1>
+    <p class="lead">Sonetrin is now collecting your results.</p>
+  </div>
+</header>
+<hr />
+<div id="loader">
+    Please wait while the search is beeing performed. You will be automatically redirected to the results page!
+     <img class="span1" src="{{asset('images/loader.gif')}}" />
+ </div>
+
+ <script>
+     
+      $(document).ready(function(){         
+            $.ajax({  
+            type: "GET",  
+            url: "{{path('search_runAjax',{'id':entity.id} )}}",  
+            success: function(msg){
+               window.location = "{{path('result',{'search':entity.id} )}}";
+            }  
+           }); 
+
+       });
+
+        $('#loader').hide();                           
+          
+          jQuery.ajaxSetup(
+          {
+           beforeSend: function() {
+               $('#search-list').fadeOut('slow');
+               $('#new-search-btn').fadeOut('slow');
+               $('#loader').show();
+            },
+            complete: function(){
+               $('#loader').fadeOut();
+            },
+            success: function() {}
+          });                    
+</script>    
+
+{% endblock %}

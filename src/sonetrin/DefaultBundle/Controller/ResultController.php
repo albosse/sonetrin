@@ -22,8 +22,12 @@ class ResultController extends Controller
      * @Template()
      */
     public function indexAction(Search $search)
-    {       
-        return array('entity' => $search);
+    {
+        $em = $this->getDoctrine()->getManager();
+        $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search);
+        $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());
+        
+        return array('entity' => $search, 'randomItems' => $randomItems, 'sentimentCount' => $sentimentCount);
     }
 
     /**
@@ -60,7 +64,7 @@ class ResultController extends Controller
         }
         return $this->redirect($this->generateUrl('result', array('search' => $id->getSearch()->getId())));
     }
-     
+
     /**
      * @Route("/test/{search}", name="result_test")
      * @Template()
@@ -71,45 +75,94 @@ class ResultController extends Controller
 
         $sentences = array();
         $results = $search->getResult();
-     
+
         foreach ($results as $result)
         {
             $file = $result->getFile();
-      
+
             foreach ($file as $entity)
             {
                 $sentences[] = $entity->text;
             }
         }
-        
+
         $ex = new \Example();
         $ex->runFile($sentences);
         return array();
     }
-    
-     /**
-     * @Route("/cake", name="result_cake_graph")
+
+    /**
      * 
+     * @param \sonetrin\DefaultBundle\Entity\Search $search
+     * 
+     * @Route("/analyze/{search}", name="result_analyze")
      */
-    public function cake()
+    public function analyzeResultsAction(Search $search)
     {
-        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
-        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
+        $em = $this->getDoctrine()->getManager();
 
-        $data = array(60, 40);
+        $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
+        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
 
-        $graph = new \PieGraph(300, 200);
-        $graph->SetShadow();
 
-        $graph->title->SetFont(FF_FONT1, FS_BOLD,20);
+        foreach ($results as $sn_result)
+        {
+            $items = $sn_result->getItem();
 
-        $p1 = new \PiePlot($data);
-        $p1->SetLegends(array('pos','neg'));     
+            foreach ($items as $item)
+            {
+                $message = $item->getMessage();
+
+                foreach ($keywords as $keyword)
+                {
+                    $pos = 0;
+                    $neg = 0;
+                    
+                    if (true == preg_match('|' .$keyword->getEnglish()  . '|i', $message))
+                    {
+                        if($keyword->getAssociation() == 'positive')
+                        {
+                            $pos++;
+                        }else
+                        {
+                            $neg++;
+                        }
+                    }
+                     if($pos > $neg)
+                     {
+                         $item->setSentiment('positive');
+                     }
+                     elseif($pos < $neg)
+                     {
+                         $item->setSentiment('negative');
+                     }                  
+                }           
+            }
+            //Save changes
+           $em->flush();
+        }
         
-        $graph->legend->SetPos(0.0,0.1,'right','center');
-        $graph->legend->SetFont(FF_FONT1, FS_BOLD, 24);
-
-        $graph->Add($p1);
-        $graph->Stroke();
+         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+    }
+    
+    /**
+     * @Route("/removeSentiments/{search}", name="result_removeSentiments")
+     */
+    public function removeSentimentsAction(Search $search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
+        
+        foreach($results as $result)
+        {
+            foreach($result->getItem() as $item)
+            {
+                $item->setSentiment(null);
+            }
+        }
+  
+        $em->flush();
+        
+         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
 }

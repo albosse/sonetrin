@@ -94,3 +94,18 @@ a.back-to-top:hover
 {
     font-weight: bold;
 }
+
+.positive-row
+{
+    background-color: #CCF5CC;
+}
+
+.negative-row
+{
+    background-color: #FFB2B2;
+}
+
+#loader
+{
+    margin-top:15px;
+}
