@@ -67,11 +67,33 @@
                 </div>
 
                 <div id="bar-graph">
-                    <select id="bar-scale" class="span2">
-                        <option>Day</option>
-                        <option selected="selected">Month</option>
-                        <option>Year</option>
-                    </select>
+
+                    <div id="bar-interval" class="row">               
+
+                        <div class="span2">                         
+                            <select id="bar-scale" class="span2" >
+                                <option>day</option>
+                                <option selected="selected">month</option>
+                                <option>year</option>
+                            </select>
+                        </div>
+                        
+                        <div class="span1">   
+                                <input placeholder="Start" class="span1" type="text" id="datepicker_start" />
+                        </div>
+                        <div class="span1">   
+                            <input placeholder="End"  class="span1" type="text" id="datepicker_end" />
+                        </div>
+                        <div class="span1">
+                         <a class="btn btn-mini" id="refreshBarGraphBtn"> 
+                        <i class=" icon-refresh"></i>
+                         </a>
+                        
+                        </div>
+                        
+
+                    </div>
+
                     <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
                 </div>  
 
@@ -114,21 +136,35 @@
 {%endif%}
 
         <script>        
-
-                $('#bar-scale').change(function() 
+             $(function() {
+                $( "#datepicker_start" ).datepicker({ dateFormat: "yy-mm-dd" });
+                $( "#datepicker_end" ).datepicker({ dateFormat: "yy-mm-dd" });
+              });
+              
+              
+                $('#refreshBarGraphBtn').click(function() 
                 {                   
                      $('#bar-graph-image').fadeOut();
-                    if( $('#bar-scale option:selected').text() == 'Month'){  
-                        $('#bar-graph-image').attr('src',"{{path('result_bar_graph',{'search':entity.id, 'scale': 'month'} )}}");
+                    
+                    var month =  $('#bar-scale option:selected').text();
+                    var start = $('#datepicker_start').val()
+                    var end   = $('#datepicker_end').val()
+                    
+                    var url = "/analysis/bar/{{entity.id}}/" + month;
+                    
+                    if(start != '' && end != '')
+                    {
+                        url += "/" + start + "/" + end;
+                    }else if(start == '' && end != '')
+                    {
+                        url += "/0/" + end;
+                    }else if(start != '' && end == '')
+                    {
+                        url += "/" + start;
                     }
-                    else if($('#bar-scale option:selected').text() == 'Day'){
-                       $('#bar-graph-image').attr("src", "{{path('result_bar_graph',{'search':entity.id, 'scale': 'day'} )}}");
-                     }
-                    else if($('#bar-scale option:selected').text() == 'Year'){
-                        $('#bar-graph-image').attr("src", "{{path('result_bar_graph',{'search':entity.id, 'scale': 'year'} )}}");
-                     }
-                      $('#bar-graph-image').fadeIn();
-                                      
+                                                                                  
+                     $('#bar-graph-image').attr('src',url);
+                     $('#bar-graph-image').fadeIn();                              
                 });
                 
                 $('#loader').hide();

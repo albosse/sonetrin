@@ -110,17 +110,17 @@ class AnalysisController extends Controller
     }
     
     /**
-     * @Route("/bar/{search}/{scale}", name="result_bar_graph", defaults={"scale" = "month"})
+     * @Route("/bar/{search}/{scale}/{start}/{end}", name="result_bar_graph", defaults={"scale" = "month", "start" = "0", "end" = "0"})
      * @Template()
      */
-    public function showBarGraphAction(Search $search, $scale)
+    public function showBarGraphAction(Search $search, $scale, $start, $end)
     {
        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_bar.php");
         
        $em = $this->getDoctrine()->getManager();
        $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Item')
-                ->findSentimentsForBarGraph($search, $scale);
+                ->findSentimentsForBarGraph($search, $scale, $start, $end);
         
         foreach($sentimentCount as $date)
         {

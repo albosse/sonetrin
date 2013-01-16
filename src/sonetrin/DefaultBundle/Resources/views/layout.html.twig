@@ -6,6 +6,7 @@
     {% block head_style %}
         {% stylesheets 
             '@sonetrinDefaultBundle/Resources/public/css/*' 
+            '@sonetrinDefaultBundle/Resources/public/js/jquery-ui-1.9.2.custom/css/smoothness/jquery-ui-1.9.2.custom.min.css' 
         %}
             <link rel="stylesheet" href="{{ asset_url }}" media="screen" />
         {% endstylesheets %}
@@ -92,7 +93,8 @@
    
     {% block javascripts %}
         {% javascripts 
-            '@sonetrinDefaultBundle/Resources/public/js/*' 
+            '@sonetrinDefaultBundle/Resources/public/js/jquery-1.8.3.min.js' 
+            '@sonetrinDefaultBundle/Resources/public/js/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.min.js' 
             '@sonetrinDefaultBundle/Resources/public/js/waypoints/waypoints.min.js' 
             '@ToaTwitterBootstrapBundle/Resources/public/twitterbootstrap/docs/assets/js/bootstrap.js'
            %}

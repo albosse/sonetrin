@@ -17,41 +17,55 @@ class ItemRepository extends EntityRepository
 
     public function findAllItemsBySearch(Search $search, $filter = false, $limit = false)
     {
-        
-         $query = $this->createQueryBuilder('i');
-            $query->where('i.search = :id');
-            $query->setParameter('id', $search->getId());
 
-            if ($filter == 'positive' || $filter == 'negative')
-            {
-                $query->andWhere('i.sentiment = :filter');
-                $query->orderBy('i.created');
-                $query->setParameter('filter', $filter);
-            }
-
-            if ($limit != false)
-            {
-                $query->setMaxResults($limit);
-            }
-            
-            $result = $query->getQuery()->getResult();
-            
-            if ($filter == 'random')
-            {
-                $result = shuffle($result);
-            }
-            
-            return $result;
-     
-    }
-
-    public function findSentimentsForBarGraph(Search $search, $scale)
-    {
         $query = $this->createQueryBuilder('i');
         $query->where('i.search = :id');
-        $query->orderBy('i.created');
         $query->setParameter('id', $search->getId());
 
+        if ($filter == 'positive' || $filter == 'negative')
+        {
+            $query->andWhere('i.sentiment = :filter');
+            $query->orderBy('i.created');
+            $query->setParameter('filter', $filter);
+        }
+
+        if ($limit != false)
+        {
+            $query->setMaxResults($limit);
+        }
+
+        $result = $query->getQuery()->getResult();
+
+        if ($filter == 'random')
+        {
+            $result = shuffle($result);
+        }
+
+        return $result;
+    }
+
+    public function findSentimentsForBarGraph(Search $search, $scale, $start = "0", $end = "0")
+    {        
+        $query = $this->createQueryBuilder('i');
+        $query->where('i.search = :id');
+       
+        if($start != "0" && $end != "0"){
+            $query->AndWhere('i.created between :start and :end');
+            $query->setParameter('start', $start);
+            $query->setParameter('end', $end);
+        }
+        elseif($start != "0" && $end == "0"){
+            $query->AndWhere('i.created > :start');
+            $query->setParameter('start', $start);
+        }
+        elseif($start == "0" && $end != "0"){
+            $query->AndWhere('i.created < :end');
+            $query->setParameter('end', $end);
+        }
+        
+        $query->orderBy('i.created');
+        $query->setParameter('id', $search->getId());
+            
         $items = $query->getQuery()->getResult();
         $data = array();
         foreach ($items as $item)
@@ -59,13 +73,12 @@ class ItemRepository extends EntityRepository
             if ($scale == 'day')
             {
                 $itemDate = date('d.m.y', $item->getCreated()->getTimestamp());
-            } elseif ($scale == "month")
+            } elseif ($scale == "year")
+            {
+                $itemDate = date('Y', $item->getCreated()->getTimestamp());
+            } else
             {
                 $itemDate = date('m.y', $item->getCreated()->getTimestamp());
-            }
-            elseif ($scale == "year")
-            {
-                $itemDate = date('y', $item->getCreated()->getTimestamp());
             }
 
             if (!isset($data[$itemDate]))
