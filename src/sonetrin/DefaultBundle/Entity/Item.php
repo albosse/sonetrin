@@ -27,7 +27,7 @@ class Item
      /**
      * @var string $message_id
      *
-     * @ORM\Column(name="message_id",  type="string", length=50)
+     * @ORM\Column(name="message_id",  type="string", length=255)
      */
     private $message_id;
 

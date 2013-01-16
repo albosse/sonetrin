@@ -19,7 +19,7 @@ class TwitterModule implements SocialNetworkInterface
     private $results_raw;
     //array with date:user:text
     private $rpp = 100;
-    private $pages = 15;
+    private $pages = 10;
     private $lang = 'en';
     private $socialNetwork;
 
@@ -80,37 +80,39 @@ class TwitterModule implements SocialNetworkInterface
             $url = $this->socialNetwork->getUrl() .
                     $query .
                     '&lang=' . $this->lang .
-                    '&until=' . $until .
-                    '&rpp=' . $this->rpp;
+//                    '&until=' . $until .
+                    '&rpp=' . $this->rpp .
+                    '&page=' . $page;
 
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $this->results_raw[] = json_decode(curl_exec($ch));
-        }
+            
 
+        }
         curl_close($ch);
         $this->processResults();
     }
 
     public function processResults()
     {
-        $newResult = false;
-        
+        //funktioniert so nicht
         if (true === is_null($this->results_raw))
         {
             return false;
         }
 
-        $result_model = $this->em->getRepository('sonetrinDefaultBundle:Result')
-                ->findOneBy(array('search' => $this->search, 
-                    'socialNetwork' => $this->socialNetwork));
+        $old_res = $this->em->getRepository('sonetrinDefaultBundle:Result')
+                ->findOneBy(array('search' => $this->search, 'socialNetwork' => $this->socialNetwork));
 
-        if (is_null($result_model))
+           
+        if (false === is_null($old_res))
         {
-            $newResult = true;
-            
+            $result_model = $old_res;
+        } else
+        {
             $result_model = new Result();
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
@@ -118,14 +120,15 @@ class TwitterModule implements SocialNetworkInterface
 
         $itemCount = 0;
         foreach ($this->results_raw as $result)
-        {
+        {            
             foreach ($result->results as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
-                        ->findOneBy(array('message_id' => $tweet->id_str, 'search' => $this->search));
-                               
-                if (true == is_null($item_exists))
-                {     
+                        ->findBy(array('message_id' => $tweet->id_str,
+                                              'search' => $this->search));
+                
+                if (true === is_null($item_exists) || true == empty($item_exists))
+                {                           
                     $item = new Item();
                     $item->setAuthor($tweet->from_user);
                     $item->setCreated(new \DateTime($tweet->created_at));
@@ -138,9 +141,7 @@ class TwitterModule implements SocialNetworkInterface
                 }
             }
         }
-
         $this->em->persist($result_model);
-        
         $this->em->flush();
 
         return true;

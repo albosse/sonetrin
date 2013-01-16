@@ -17,18 +17,15 @@ class ItemRepository extends EntityRepository
 
     public function findAllItemsBySearch(Search $search, $filter = false, $limit = false)
     {
-        $results = $search->getResult();
-        $items = array();
-
-        foreach ($results as $result)
-        {
-            $query = $this->createQueryBuilder('r');
-            $query->where('r.result = :id');
-            $query->setParameter('id', $result->getId());
+        
+         $query = $this->createQueryBuilder('i');
+            $query->where('i.search = :id');
+            $query->setParameter('id', $search->getId());
 
             if ($filter == 'positive' || $filter == 'negative')
             {
-                $query->andWhere('r.sentiment = :filter');
+                $query->andWhere('i.sentiment = :filter');
+                $query->orderBy('i.created');
                 $query->setParameter('filter', $filter);
             }
 
@@ -36,18 +33,16 @@ class ItemRepository extends EntityRepository
             {
                 $query->setMaxResults($limit);
             }
-
-            $items = array_merge($items, $query->getQuery()->getResult());
-
+            
+            $result = $query->getQuery()->getResult();
+            
             if ($filter == 'random')
             {
-                shuffle($items);
+                $result = shuffle($result);
             }
-        }
-
-        $array = ($items);
-
-        return $array;
+            
+            return $result;
+     
     }
 
     public function findSentimentsForBarGraph(Search $search, $scale)
