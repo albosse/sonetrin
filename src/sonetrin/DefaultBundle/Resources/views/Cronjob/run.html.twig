@@ -1,0 +1,18 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+
+{% block content %}
+    <header class="jumbotron subhead" id="overview">
+    <div class="container">
+        <h1>{{ 'Cronjobs'|trans }} </h1>
+    </div>                 
+    </header>
+<hr />
+
+<ul>
+    {% for log in cronlog %}
+    <li>{{log}}</li>
+    {%else%}
+    No cronjobs needed to be run.
+    {% endfor%}
+</ul>        
+{% endblock %}

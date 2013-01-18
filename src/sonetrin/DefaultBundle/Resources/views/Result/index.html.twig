@@ -62,40 +62,43 @@
                         Remove sentiments
                     </a>
                 </legend>
-                <div id="pie-graph">
-                    <img src="{{path('result_cake_graph', {'search': entity.id } )}}" />
-                </div>
-
-                <div id="bar-graph">
-
-                    <div id="bar-interval" class="row">               
-
-                        <div class="span2">                         
-                            <select id="bar-scale" class="span2" >
-                                <option>day</option>
-                                <option selected="selected">month</option>
-                                <option>year</option>
-                            </select>
-                        </div>
-                        
-                        <div class="span1">   
-                                <input placeholder="Start" class="span1" type="text" id="datepicker_start" />
-                        </div>
-                        <div class="span1">   
-                            <input placeholder="End"  class="span1" type="text" id="datepicker_end" />
-                        </div>
-                        <div class="span1">
-                         <a class="btn btn-mini" id="refreshBarGraphBtn"> 
-                        <i class=" icon-refresh"></i>
-                         </a>
-                        
-                        </div>
-                        
-
+            
+                <div id="graphs">
+                    
+                    <div id="pie-graph">
+                        <img src="{{path('result_cake_graph', {'search': entity.id } )}}" />
                     </div>
+
+                    <div id="bar-graph">
+
+                        <div id="bar-interval" class="row">               
+
+                            <div class="span2">                         
+                                <select id="bar-scale" class="span2" >
+                                    <option>day</option>
+                                    <option selected="selected">month</option>
+                                    <option>year</option>
+                                </select>
+                            </div>
+
+                            <div class="span1">   
+                                    <input placeholder="Start" class="span1" type="text" id="datepicker_start" />
+                            </div>
+                            <div class="span1">   
+                                <input placeholder="End"  class="span1" type="text" id="datepicker_end" />
+                            </div>
+                            <div class="span1">
+                             <a class="btn btn-mini" id="refreshBarGraphBtn"> 
+                            <i class=" icon-refresh"></i>
+                             </a>
+
+                            </div>
+                        </div>
 
                     <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
                 </div>  
+                    
+               </div>
 
          {%endif%}
                 <div id="loader">
@@ -176,7 +179,6 @@
                     url: "{{path('result_analyze',{'search':entity.id} )}}",  
                     data: "",  
                     success: function(msg){
-                       // $('#pie-graph').append('<img src="{{path('result_cake_graph', {'search': entity.id } )}}" />');
                        window.location.reload();
                     }  
                      });  
@@ -197,7 +199,7 @@
           
                   jQuery.ajaxSetup({
                    beforeSend: function() {
-                       $('#pie-graph img').remove();
+                       $('#graphs').remove();
                        $('#analyzeResultsBtn').addClass('disabled');
                        $('#removeSentimentsBtn').addClass('disabled');
                        $('#loader').show();

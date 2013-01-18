@@ -129,7 +129,6 @@ class SearchController extends Controller
             $socialNetworks = $em->getRepository('sonetrinDefaultBundle:SocialNetwork')->findAll();        
             $search = new Search();
             $search->setName($query);
-            $search->setEndDate(new \DateTime());
 
             foreach($socialNetworks as $sn)
             {
@@ -284,7 +283,7 @@ class SearchController extends Controller
        
         //Get new search entity with new results
         $em->refresh($search);
-        return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+        return $this->redirect($this->generateUrl('result_analyze', array('search' => $search->getId())));  
     }
     
      /**
@@ -296,7 +295,6 @@ class SearchController extends Controller
     {    
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
-//        $search->removeAllResults();
                
         foreach($search->getSocialNetwork() as $sn)
         {
@@ -311,13 +309,10 @@ class SearchController extends Controller
             }
         }
         
-        //analyze new results
-//        $c = new ResultController();
         $em->refresh($search);
-//        $c->analyzeResultsAction($search);
+        return $this->forward('sonetrinDefaultBundle:Result:analyzeResults', array('search' =>  $search->getId()));
         
-        //Get new search entity with new results
-        return $this->redirect($this->generateUrl('result_analyze', array('search' => $search->getId())));  
+//        return $this->redirect($this->generateUrl('result_analyze', array('search' => $search->getId())));  
     }
 
     private function getTwitterResults($search)

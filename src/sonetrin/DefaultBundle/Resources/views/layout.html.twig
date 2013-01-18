@@ -37,7 +37,7 @@
                         <li {% if 'default_index' in app.request.attributes.get('_route') %} class="active" {%endif%}><a href="{{ path('default_index') }}">Start</a></li>
                         <li {% if  'search' in app.request.attributes.get('_route') or 'result' in app.request.attributes.get('_route')  %} 
                             class="active" {%endif%}><a href="{{ path('search') }}">Search</a></li>
-                        <li {% if 'keyword' in app.request.attributes.get('_route') %} class="active" {%endif%} class="dropdown">
+                        <li {% if 'keyword' in app.request.attributes.get('_route') or 'social' in app.request.attributes.get('_route') or 'cronjob' in app.request.attributes.get('_route') %} class="active" {%endif%} class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                               Settings
                               <b class="caret"></b>
@@ -45,8 +45,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{ path('keyword_index') }}">Keywords</a></li>
                                 <li><a href="{{ path('socialnetwork') }}">Social Networks</a></li>
-                                <li><a href="">User Administration</a></li>
-                                <li><a href="">Data Collection Cronjobs</a></li>
+                                <li><a href="{{ path('cronjob') }}">Data Collection Cronjobs</a></li>
                             </ul>
                         </li>                       
                         <li {% if 'default_about' in app.request.attributes.get('_route') %} class="active" {%endif%}><a href="{{ path('default_about') }}">About</a></li>

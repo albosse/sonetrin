@@ -8,6 +8,12 @@
         <service id="sonetrin.twig.default_extension" class="sonetrin\DefaultBundle\Twig\Extensions\DefaultExtension">
             <tag name="default.extension" />
         </service>
+       
+        <service id="search_controller" class="sonetrin\DefaultBundle\Controller\SearchController">
+          <tag name="search_controller" />
+        </service>
   </services>
+  
+  
    
 </container>

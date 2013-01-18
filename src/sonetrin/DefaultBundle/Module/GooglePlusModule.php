@@ -21,7 +21,7 @@ class GooglePlusModule implements SocialNetworkInterface
     private $lang = 'en';
     private $socialNetwork;
     private $maxResults = 20;
-    private $cycles = 10;
+    private $cycles = 20;
 
     public function __construct($em, Search $search)
     {

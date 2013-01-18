@@ -24,11 +24,11 @@ class Search
     private $id;
 
     /**
-     * @var SearchItem $searchItem
+     * @var string $name
      *
-     * @ORM\OneToMany(targetEntity="SearchItem", mappedBy="id", orphanRemoval=true,cascade={"persist","remove"})
+     * @ORM\Column(name="name", type="string", length=255)
      */
-    private $items;
+    private $name;
 
     /**
      * @var SocialNetwork $socialNetwork
@@ -41,33 +41,14 @@ class Search
      */
     private $socialNetwork;
 
-    /**
-     * @var \DateTime $startDate
-     *
-     * @ORM\Column(name="startDate", type="date")
-     */
-    private $startDate;
 
     /**
      * @var \DateTime $endDate
      *
-     * @ORM\Column(name="endDate", type="date")
+     * @ORM\Column(name="endDate", type="date", nullable=true)
      */
     private $endDate;
 
-    /**
-     * @var boolean $semantic
-     *
-     * @ORM\Column(name="semantic", type="boolean")
-     */
-    private $semantic;
-
-    /**
-     * @var boolean $hashtags
-     *
-     * @ORM\Column(name="hashtags", type="boolean", nullable=true)
-     */
-    private $hashtags;
 
     /**
      * @ORM\OneToMany(targetEntity="Result", mappedBy="search", cascade={"remove"}, orphanRemoval=true)
@@ -83,6 +64,13 @@ class Search
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     protected $updatedAt;
+    
+    /**
+     * @var cronjob
+     *
+     * @ORM\OneToOne(targetEntity="Cronjob", cascade={"remove"})
+     */
+    protected $cronjob;
 
     /**
      * @ORM\prePersist
@@ -135,29 +123,6 @@ class Search
     }
 
     /**
-     * Set startDate
-     *
-     * @param \DateTime $startDate
-     * @return Search
-     */
-    public function setStartDate($startDate)
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    /**
-     * Get startDate
-     *
-     * @return \DateTime 
-     */
-    public function getStartDate()
-    {
-        return $this->startDate;
-    }
-
-    /**
      * Set endDate
      *
      * @param \DateTime $endDate
@@ -178,29 +143,6 @@ class Search
     public function getEndDate()
     {
         return $this->endDate;
-    }
-
-    /**
-     * Set semantic
-     *
-     * @param boolean $semantic
-     * @return Search
-     */
-    public function setSemantic($semantic)
-    {
-        $this->semantic = $semantic;
-
-        return $this;
-    }
-
-    /**
-     * Get semantic
-     *
-     * @return boolean 
-     */
-    public function getSemantic()
-    {
-        return $this->semantic;
     }
 
     /**
@@ -282,6 +224,7 @@ class Search
 
     /**
      * Remove all results
+     * @ORM\PreUpdate()
      */
     public function removeAllResults()
     {
@@ -308,29 +251,6 @@ class Search
         $count = $this->getResult()->count();
 
         return $count > 0 ? true : false;
-    }
-
-    /**
-     * Set hashtags
-     *
-     * @param boolean $hashtags
-     * @return Search
-     */
-    public function setHashtags($hashtags)
-    {
-        $this->hashtags = $hashtags;
-
-        return $this;
-    }
-
-    /**
-     * Get hashtags
-     *
-     * @return boolean 
-     */
-    public function getHashtags()
-    {
-        return $this->hashtags;
     }
 
     /**
@@ -383,37 +303,4 @@ class Search
         return $this->updatedAt;
     }
     
-
-    /**
-     * Add searchItem
-     *
-     * @param \sonetrin\DefaultBundle\Entity\SearchItem $searchItem
-     * @return Search
-     */
-    public function addSearchItem(\sonetrin\DefaultBundle\Entity\SearchItem $searchItem)
-    {
-        $this->searchItem[] = $searchItem;
-    
-        return $this;
-    }
-
-    /**
-     * Remove searchItem
-     *
-     * @param \sonetrin\DefaultBundle\Entity\SearchItem $searchItem
-     */
-    public function removeSearchItem(\sonetrin\DefaultBundle\Entity\SearchItem $searchItem)
-    {
-        $this->searchItem->removeElement($searchItem);
-    }
-
-    /**
-     * Get searchItem
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getSearchItem()
-    {
-        return $this->searchItem;
-    }
 }

@@ -1,0 +1,23 @@
+{% form_theme form 'ToaTwitterBootstrapBundle:Form:widgets.html.twig' %}
+
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ 'Cronjob'|trans }} {{ 'creation'|trans }}</h1>
+
+<form class="form-horizontal" action="{{ path('cronjob_create') }}" method="post" {{ form_enctype(form) }}>
+    {{ form_widget(form) }}
+    <p>
+        <button class="btn" type="submit">
+            <i class="icon-plus"></i>
+            {{ 'create'|trans }}
+        </button>
+    </p>
+</form>
+
+<a class="btn" href="{{ path('cronjob') }}">
+    <i class="icon-th-list"></i>
+    {{ 'back to the list'|trans }}
+</a>
+{% endblock %}

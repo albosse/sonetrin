@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Entity\Keyword;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/results")
@@ -22,7 +23,7 @@ class ResultController extends Controller
      * @Template()
      */
     public function indexAction(Search $search, $filter)
-    {
+    {               
         $em = $this->getDoctrine()->getManager();
         $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search,$filter);
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());
@@ -35,7 +36,7 @@ class ResultController extends Controller
      * @Template()
      */
     public function showAction(Result $id, $count, $filter)
-    {
+    {        
         $em = $this->getDoctrine()->getManager();
             
         $result = $em->getRepository('sonetrinDefaultBundle:Result')->find($id->getId());
@@ -140,8 +141,8 @@ class ResultController extends Controller
                 {
                     $pos = 0;
                     $neg = 0;
-                    
-                    if (true == preg_match('|' .$keyword->getEnglish()  . '|i', $message))
+   
+                    if (true == preg_match('|' . preg_quote($keyword->getEnglish())  . '|i', $message))
                     {
                         if($keyword->getAssociation() == 'positive')
                         {
@@ -164,8 +165,8 @@ class ResultController extends Controller
             //Save changes
            $em->flush();
         }
-        
-         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+        return new Response('finished');
+//         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
     
     /**

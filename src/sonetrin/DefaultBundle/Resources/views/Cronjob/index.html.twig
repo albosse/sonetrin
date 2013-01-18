@@ -1,0 +1,70 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+
+{% block content %}
+
+<h1 class="page-header">{{ 'Cronjob'|trans }} {{ 'list'|trans }}</h1>
+
+<table class="records_list table table-bordered table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>{{ 'Id'|trans }}</th>
+            <th>{{ 'Search'|trans }}</th>
+            <th>{{ 'Frequency'|trans }}</th>
+            <th>{{ 'Active'|trans }}</th>
+            <th>{{ 'LastRun'|trans }}</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entity in entities %}
+        <tr>
+            <td><a href="{{ path('cronjob_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+             <td>{{ entity.search.name }}</td>
+            <td>{{ entity.frequency }}</td>
+            <td><i class="{{ entity.active ? 'icon-check' : '' }}"></i></td>
+            <td>{% if entity.lastRun %}{{ entity.lastRun|date('Y-m-d H:i:s') }}{% endif %}</td>
+            <td>
+                <a class="btn btn-mini" href="{{ path('cronjob_show', { 'id': entity.id }) }}">
+                    <i class="icon-eye-open"></i>
+                    {{ 'show'|trans }}
+                </a>
+                <a class="btn btn-mini" href="{{ path('cronjob_edit', { 'id': entity.id }) }}">
+                    <i class="icon-pencil"></i>
+                    {{ 'edit'|trans }}
+                </a>                  
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a class="btn" href="{{ path('cronjob_new') }}">
+    <i class="icon-plus"></i>
+    {{ 'create a new entry'|trans }}
+</a>
+ <a class="btn btn-inverse" id="cronjobsRunBtn">
+                    <i class="icon-step-forward icon-white"></i>
+                    {{ 'run active cronjobs'|trans }}
+ </a>
+
+<br /><br />
+
+<div id="cronlog" class="well"></div>
+
+<script>
+           
+        $('#cronjobsRunBtn').click(function()
+        {
+            $.ajax({  
+              type: "GET",  
+              url: "{{path('cronjob_run')}}",  
+              success: function(msg){
+                 alert('Done');
+                 $('#cronlog').html(msg);
+              }  
+             });             
+         });
+          
+</script>
+
+{% endblock %}

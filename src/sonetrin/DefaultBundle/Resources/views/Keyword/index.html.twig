@@ -7,7 +7,7 @@
         <h1>Keywords</h1>
         <p class="lead">Define Keywords to identify positive and negative associations.
 
-            <a href="#">
+            <a href="{{path('keyword_importList')}}">
                 <img src="{{ asset('images/icons/add_list.png') }}" title="Import List" alt="Import List" class="icon" />
             </a>  
         </p>
@@ -19,7 +19,7 @@
 
     <div class="keywords span5">
         <table class="keywords-table table table-hover">       
-            <legend>Positive Keywords
+            <legend>Positive Keywords ({{positiveKeywords|length}})
                 <a href="{{path('keyword_add', {'assoc':'positive'})}}">
                     <img src="{{ asset('images/icons/add.png') }}" title="Add Keyword" alt="Add Keyword" class="icon" />
                 </a>
@@ -52,7 +52,7 @@
 
         <div class="keywords span5">
             <table class="keywords-table table table-hover"> 
-                <legend>Negative Keywords
+                <legend>Negative Keywords ({{negativeKeywords|length}})
                     <a href="{{path('keyword_add',{'assoc':'negative'})}}">
                         <img src="{{ asset('images/icons/add.png') }}" title="Add Keyword" alt="Add Keyword" class="icon" />
                     </a>

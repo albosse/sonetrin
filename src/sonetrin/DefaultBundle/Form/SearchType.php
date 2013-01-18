@@ -13,14 +13,9 @@ class SearchType extends AbstractType
     {
         $builder
             ->add('name',null,array('label' => 'Search'))
-            ->add('startDate',null,array(
-                    'years' => range(2000,date('Y',time()))
-                ))
             ->add('endDate',null,array(
-                    'years' => range(2000,date('Y',time())),
-                    'data' => new \DateTime()
+                    'required' => false
                 ))
-            ->add('semantic',null,array('required' => false))
             ->add('socialNetwork','entity', array(
                     'class' => 'sonetrinDefaultBundle:SocialNetwork',
                     'property' => 'name',

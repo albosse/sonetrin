@@ -14,16 +14,8 @@
             <td>{{ entity.name }}</td>
         </tr>
         <tr>
-            <th>Startdate</th>
-            <td>{% if entity.startDate %}{{ entity.startDate|date('Y-m-d') }}{% endif %}</td>
-        </tr>
-        <tr>
             <th>Enddate</th>
             <td>{% if entity.endDate %}{{ entity.endDate|date('Y-m-d') }}{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Semantic</th>
-            <td><i class="{{ entity.semantic ? 'icon-check' : '' }}"></i></td>
         </tr>
         <tr>
             <th>Results</th>

@@ -41,12 +41,6 @@ class Search
      */
     private $socialNetwork;
 
-    /**
-     * @var \DateTime $startDate
-     *
-     * @ORM\Column(name="startDate", type="date", nullable=true)
-     */
-    private $startDate;
 
     /**
      * @var \DateTime $endDate
@@ -55,19 +49,6 @@ class Search
      */
     private $endDate;
 
-    /**
-     * @var boolean $semantic
-     *
-     * @ORM\Column(name="semantic", type="boolean", nullable=true)
-     */
-    private $semantic;
-
-    /**
-     * @var boolean $hashtags
-     *
-     * @ORM\Column(name="hashtags", type="boolean", nullable=true)
-     */
-    private $hashtags;
 
     /**
      * @ORM\OneToMany(targetEntity="Result", mappedBy="search", cascade={"remove"}, orphanRemoval=true)
@@ -83,7 +64,13 @@ class Search
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     protected $updatedAt;
-
+    
+    /**
+     * @ORM\OneToOne(targetEntity="Cronjob", mappedBy="search", cascade={"remove"})
+     */
+    protected $cronjob;
+    
+    
     /**
      * @ORM\prePersist
      */
@@ -135,29 +122,6 @@ class Search
     }
 
     /**
-     * Set startDate
-     *
-     * @param \DateTime $startDate
-     * @return Search
-     */
-    public function setStartDate($startDate)
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    /**
-     * Get startDate
-     *
-     * @return \DateTime 
-     */
-    public function getStartDate()
-    {
-        return $this->startDate;
-    }
-
-    /**
      * Set endDate
      *
      * @param \DateTime $endDate
@@ -178,29 +142,6 @@ class Search
     public function getEndDate()
     {
         return $this->endDate;
-    }
-
-    /**
-     * Set semantic
-     *
-     * @param boolean $semantic
-     * @return Search
-     */
-    public function setSemantic($semantic)
-    {
-        $this->semantic = $semantic;
-
-        return $this;
-    }
-
-    /**
-     * Get semantic
-     *
-     * @return boolean 
-     */
-    public function getSemantic()
-    {
-        return $this->semantic;
     }
 
     /**
@@ -312,29 +253,6 @@ class Search
     }
 
     /**
-     * Set hashtags
-     *
-     * @param boolean $hashtags
-     * @return Search
-     */
-    public function setHashtags($hashtags)
-    {
-        $this->hashtags = $hashtags;
-
-        return $this;
-    }
-
-    /**
-     * Get hashtags
-     *
-     * @return boolean 
-     */
-    public function getHashtags()
-    {
-        return $this->hashtags;
-    }
-
-    /**
      *
      * @ORM\PrePersist()
      *
@@ -382,6 +300,5 @@ class Search
     public function getUpdatedAt()
     {
         return $this->updatedAt;
-    }
-
+    }   
 }

@@ -67,13 +67,13 @@ class TwitterModule implements SocialNetworkInterface
             }
         }
 
-        try
-        {
-            $until = $this->search->getEndDate()->format('Y-m-d');
-        } catch (\Exception $e)
-        {
-            $until = new \DateTime();
-        }
+//        try
+//        {
+//            $until = $this->search->getEndDate()->format('Y-m-d');
+//        } catch (\Exception $e)
+//        {
+//            $until = new \DateTime();
+//        }
 
         for ($page = 1; $page <= $this->pages; $page++)
         {
