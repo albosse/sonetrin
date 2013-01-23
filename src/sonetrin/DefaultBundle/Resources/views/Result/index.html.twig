@@ -138,7 +138,9 @@
         <p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
 {%endif%}
 
-        <script>        
+        <script>
+            $('#loader').hide();
+                            
              $(function() {
                 $( "#datepicker_start" ).datepicker({ dateFormat: "yy-mm-dd" });
                 $( "#datepicker_end" ).datepicker({ dateFormat: "yy-mm-dd" });
@@ -147,7 +149,9 @@
               
                 $('#refreshBarGraphBtn').click(function() 
                 {                   
-                     $('#bar-graph-image').fadeOut();
+                    $('#error').remove(); 
+                    
+                    $('#bar-graph-image').fadeOut();
                     
                     var month =  $('#bar-scale option:selected').text();
                     var start = $('#datepicker_start').val()
@@ -166,12 +170,10 @@
                         url += "/" + start;
                     }
                                                                                   
-                     $('#bar-graph-image').attr('src',url);
+                     $('#bar-graph-image').attr('src',url);                  
                      $('#bar-graph-image').fadeIn();                              
                 });
-                
-                $('#loader').hide();
-       
+                       
                 $('#analyzeResultsBtn').click(function()
                 {       
                     $.ajax({  

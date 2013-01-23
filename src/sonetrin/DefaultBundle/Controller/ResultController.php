@@ -23,11 +23,11 @@ class ResultController extends Controller
      * @Template()
      */
     public function indexAction(Search $search, $filter)
-    {               
+    {
         $em = $this->getDoctrine()->getManager();
-        $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search,$filter);
+        $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search, $filter);
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());
-        
+
         return array('entity' => $search, 'randomItems' => $randomItems, 'sentimentCount' => $sentimentCount);
     }
 
@@ -36,25 +36,24 @@ class ResultController extends Controller
      * @Template()
      */
     public function showAction(Result $id, $count, $filter)
-    {        
+    {
         $em = $this->getDoctrine()->getManager();
-            
+
         $result = $em->getRepository('sonetrinDefaultBundle:Result')->find($id->getId());
-        
-        if($filter == 'positive' || $filter == 'negative')
+
+        if ($filter == 'positive' || $filter == 'negative')
         {
-            $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId(),'sentiment' => $filter));
-        }
-        else
+            $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId(), 'sentiment' => $filter));
+        } else
         {
-             $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId()));
+            $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => $id->getId()));
         }
-        
-        if($filter == 'random')
+
+        if ($filter == 'random')
         {
             shuffle($items);
         }
-        
+
         $countItems = count($items);
         if ($count > $countItems)
         {
@@ -62,8 +61,8 @@ class ResultController extends Controller
         }
 
         return array('entity' => $result,
-                     'items' => $items,
-                      'count' => $count);
+            'items' => $items,
+            'count' => $count);
     }
 
     /**
@@ -110,6 +109,10 @@ class ResultController extends Controller
     }
 
     /**
+     * Analyzes results based on a list of positive and negative keywords
+     * 
+     * If there are more positive than negative keywords, 
+     * the message is considered to be positive and counterwise
      * 
      * @param \sonetrin\DefaultBundle\Entity\Search $search
      * 
@@ -119,56 +122,51 @@ class ResultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
+//        $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('search' => $search->getId()));
         $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
 
-
-        foreach ($results as $sn_result)
+        foreach ($items as $item)
         {
-            $items = $sn_result->getItem();
-
-            foreach ($items as $item)
-            {
-                //if item already has a sentiment
-                if(false === is_null($item->getSentiment()))
-                {
-                    continue;
-                }
-                
-                $message = $item->getMessage();
-
-                foreach ($keywords as $keyword)
-                {
-                    $pos = 0;
-                    $neg = 0;
-   
-                    if (true == preg_match('|' . preg_quote($keyword->getEnglish())  . '|i', $message))
-                    {
-                        if($keyword->getAssociation() == 'positive')
-                        {
-                            $pos++;
-                        }else
-                        {
-                            $neg++;
-                        }
-                    }
-                     if($pos > $neg)
-                     {
-                         $item->setSentiment('positive');
-                     }
-                     elseif($pos < $neg)
-                     {
-                         $item->setSentiment('negative');
-                     }                  
-                }           
+            //if item already has a sentiment
+            if (false === is_null($item->getSentiment())){
+                continue;
             }
-            //Save changes
-           $em->flush();
+
+            $message = $item->getMessage();
+
+            //reset counter
+            $pos = 0;
+            $neg = 0;
+
+            foreach ($keywords as $keyword)
+            {
+                if (true == preg_match('| [#]*' . preg_quote($keyword->getEnglish()) . '[^-]|i', $message))
+                {
+                    if ($keyword->getAssociation() == 'positive')
+                    {
+                        $pos++;
+                    } else
+                    {
+                        $neg++;
+                    }
+                }
+            }
+            if ($pos > $neg)
+            {
+                $item->setSentiment('positive');
+            } elseif ($pos < $neg)
+            {
+                $item->setSentiment('negative');
+            }
         }
+        //Save changes
+        $em->flush();
+
         return new Response('finished');
 //         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
-    
+
     /**
      * @Route("/removeSentiments/{search}", name="result_removeSentiments")
      */
@@ -176,20 +174,20 @@ class ResultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
-        
-        foreach($results as $result)
+
+        foreach ($results as $result)
         {
-            foreach($result->getItem() as $item)
+            foreach ($result->getItem() as $item)
             {
                 $item->setSentiment(null);
             }
         }
-  
+
         $em->flush();
-        
-         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
+
+        return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
-    
+
     /**
      * @Route("/removeUndefined", name="result_removeUndefinedResults")
      */
@@ -197,14 +195,60 @@ class ResultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $results = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('result' => null));
-        
-        foreach($results as $result)
+
+        foreach ($results as $result)
         {
             $em->remove($result);
         }
         $em->flush();
-        
+
         return $this->redirect($this->generateUrl('search'));
-              
     }
+      
+        /**
+     * Analyzes results based on a list of positive and negative keywords
+     * 
+     * If there are more positive than negative keywords, 
+     * the message is considered to be positive and counterwise
+     * 
+     * @param \sonetrin\DefaultBundle\Entity\Search $search
+     * 
+     * @Route("/analyzeOne/{message}", name="result_analyzeOne")
+     */
+    public function analyzeOneResultAction($message)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
+      
+        //reset counter
+        $pos = 0;
+        $neg = 0;
+        
+         echo $message . ' : <br />'; 
+
+        foreach ($keywords as $keyword)
+        {
+            if (true == preg_match('| [#]*' . preg_quote($keyword->getEnglish()) . '[^-]|i', $message))
+            {             
+                if ($keyword->getAssociation() == 'positive')
+                {
+                    echo preg_quote($keyword->getEnglish()) . ': positive <br />';
+                    $pos++;
+                } else
+                {
+                     echo preg_quote($keyword->getEnglish()) . ': negative <br />';
+                    $neg++;
+                }
+            }
+        }
+        
+        echo '<br /><br />';
+        echo 'Positive: ' . $pos . '<br />';
+        echo 'Negative: ' . $neg;
+        
+        die;
+        return array();
+    }
+
 }

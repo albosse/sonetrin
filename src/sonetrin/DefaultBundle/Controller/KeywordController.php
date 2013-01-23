@@ -153,7 +153,7 @@ class KeywordController extends Controller
             'delete_form' => $deleteForm->createView(),
         );
     }
-    
+
     /**
      * Import a keword list
      *
@@ -163,14 +163,19 @@ class KeywordController extends Controller
     public function importListAction()
     {
         $request = $this->getRequest();
-        
+
         $form = $this->createFormBuilder()
-                ->add('keywords', 'textarea', array('label' =>'Keywords (comma seperated)','attr' => array('class' => 'span6', 'rows' => 10)))
-                ->add('association', 'choice', 
-                        array('expanded' => false,
-                                'multiple' => false,
-                                'choices' => array('positive' => 'positive',
-                                                   'negative' => 'negative')))
+                ->add('keywords', 'textarea', array('label' => 'Keywords (comma seperated)', 'attr' => array('class' => 'span6', 'rows' => 10)))
+                ->add('seperation', 'choice', array('expanded' => false,
+                    'multiple' => false,
+                    'data' => 'comma',
+                    'choices' => array('comma' => 'comma',
+                        'semicolon' => 'semicolon',
+                        'newLine' => 'new line')))
+                ->add('association', 'choice', array('expanded' => false,
+                    'multiple' => false,
+                    'choices' => array('positive' => 'positive',
+                        'negative' => 'negative')))
                 ->getForm();
 
         if ($request->isMethod('POST'))
@@ -180,11 +185,25 @@ class KeywordController extends Controller
             // data is an array with "name", "email", and "message" keys
             $data = $form->getData();
             $keywords = $data['keywords'];
+            $seperation = $data['seperation'];
             $em = $this->getDoctrine()->getManager();
-
             if ($keywords != '')
             {
-                $keywordsArray = explode(',', $keywords);
+                $count = 0;
+
+                switch ($seperation)
+                {
+                    case 'comma':
+                        $keywordsArray = explode(',', $keywords);
+                        break;
+                    case 'semicolon':
+                        $keywordsArray = explode(';', $keywords);
+                        break;
+                    case 'newLine':
+                        $keywords = nl2br($keywords);
+                        $keywordsArray = explode('<br />', $keywords);
+                        break;
+                }
 
                 foreach ($keywordsArray as $word)
                 {
@@ -198,12 +217,12 @@ class KeywordController extends Controller
                         $keyword->setEnglish($word);
                         $keyword->setAssociation($data['association']);
                         $em->persist($keyword);
+                        $count++;
                     }
                 }
-
                 $em->flush();
 
-                $this->get('session')->getFlashBag()->add('notice', 'Your changes were saved!');
+                $this->get('session')->getFlashBag()->add('notice', 'Your changes were saved! ' . $count . ' keyword(s) were added.');
 
                 return $this->redirect($this->generateUrl('keyword_index'));
             } else
@@ -211,61 +230,35 @@ class KeywordController extends Controller
                 $this->get('session')->getFlashBag()->add('error', 'The textarea contains some errors!');
             }
         }
-        
+
         return array('form' => $form->createView());
     }
 
     /**
-     * Import a keword list
+     * Clean a keword list
+     * 
+     *  - Remove whitespaces from beginning and end
      *
-     * @Route("/import", name="keyword_importList")
+     * @Route("/clean", name="keyword_clean")
      * @Template()
      */
-   /* public function importListAction()
+    public function cleanAction()
     {
-        $error = false;
-
-        $request = $this->getRequest();
         $em = $this->getDoctrine()->getManager();
+        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
 
-        if ($request->getMethod() == 'POST')
+        foreach ($keywords as $keyword)
         {
-            $keywords = $_POST['keywords'];
-            $association = $_POST['association'];
-
-            if ($keywords != '')
-            {
-                $keywordsArray = explode(',', $keywords);
-
-
-                foreach ($keywordsArray as $word)
-                {
-                    $word = trim($word);
-
-                    $item_exists = $em->getRepository('sonetrinDefaultBundle:Keyword')->findOneBy(array('english' => $word));
-
-                    if (is_null($item_exists))
-                    {
-                        $keyword = new Keyword();
-                        $keyword->setEnglish($word);
-                        $keyword->setAssociation($association);
-                        $em->persist($keyword);
-                    }
-                }
-
-                $em->flush();
-
-                $this->get('session')->getFlashBag()->add('notice', 'Your changes were saved!');
-
-                return $this->redirect($this->generateUrl('keyword_index'));
-            } else
-            {
-                $this->get('session')->getFlashBag()->add('error', 'The textarea contains some errors!');
-            }
+            echo $keyword->getEnglish() . "<br />";
+            $message= $keyword->getEnglish();
+            $keyword->setEnglish(trim($message));
+            
         }
 
-        return array(
-        );
+        $em->flush();
+        
+        $this->get('session')->getFlashBag()->add('notice', 'Keywords were cleaned!');
+        return array();        
     }
-    */
+
 }

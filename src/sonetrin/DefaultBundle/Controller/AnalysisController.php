@@ -122,6 +122,11 @@ class AnalysisController extends Controller
        $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Item')
                 ->findSentimentsForBarGraph($search, $scale, $start, $end);
         
+       if(true == empty($sentimentCount))
+       {
+           return false;
+       }
+       
         foreach($sentimentCount as $date)
         {
             $datay1[] = $date['positive'];
@@ -164,6 +169,6 @@ class AnalysisController extends Controller
         $graph->Add($gbarplot);
 
         $graph->Stroke();
-         return array();
+        return array();
     }  
 }

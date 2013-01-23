@@ -49,9 +49,24 @@
 
 <br /><br />
 
-<div id="cronlog" class="well"></div>
+<div id="loader">
+    <img class="span2" src="{{asset('images/loader.gif')}}" />
+</div>
+</div>
 
 <script>
+    $('#loader').hide();
+    
+    jQuery.ajaxSetup({
+          beforeSend: function() {
+              $('#cronlog').remove();
+              $('#loader').show();
+           },
+           complete: function(){
+              $('#loader').hide();
+           },
+           success: function() {}
+         });
            
         $('#cronjobsRunBtn').click(function()
         {
@@ -59,8 +74,11 @@
               type: "GET",  
               url: "{{path('cronjob_run')}}",  
               success: function(msg){
-                 alert('Done');
-                 $('#cronlog').html(msg);
+                  if(msg == '[]')
+                  {
+                      msg = 'No cronjobs needed to be done.';
+                  }
+                 $('<div id="cronlog" class="well"> ' + msg + '</div>').insertAfter($('#loader'));
               }  
              });             
          });

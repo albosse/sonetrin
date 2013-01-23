@@ -100,11 +100,6 @@ class ItemRepository extends EntityRepository
                     $data[$itemDate]['neutral']++;
                     break;
             }
-
-            if ($data[$itemDate]['positive'] == 0 && $data[$itemDate]['negative'] == 0)
-            {
-                unset($data[$itemDate]);
-            }
         }
 
         return $data;
