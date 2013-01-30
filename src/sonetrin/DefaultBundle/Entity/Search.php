@@ -70,6 +70,11 @@ class Search
      */
     protected $cronjob;
     
+     /**
+     * @ORM\Column(name="executed", type="integer")
+     */
+    protected $executed;
+    
     
     /**
      * @ORM\prePersist
