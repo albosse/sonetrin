@@ -123,7 +123,7 @@
                             {%for key,entity in randomItems %}
                                 {%if key < 20 %}
                         <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
-                            <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
+                            <td>{{ entity.created| date('Y-m-d') }} <a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
                             <td>{{ entity.message }}</td>
                             <td>  
                                 <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>

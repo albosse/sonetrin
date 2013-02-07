@@ -128,11 +128,16 @@ class TwitterModule implements SocialNetworkInterface
                 {                           
                     $item = new Item();
                     $item->setAuthor($tweet->from_user);
+                    $item->setAuthorId($tweet->from_user_id);
                     $item->setCreated(new \DateTime($tweet->created_at));
                     $item->setMessage($tweet->text);
-                    $item->setMessage_id($tweet->id_str);
+                    $item->setMessage_id($tweet->id_str);                  
                     $item->setResult($result_model);
                     $item->setSearch($this->search);
+                    
+                    $url = "https://twitter.com/" . $tweet->from_user  . "/status/" .  $tweet->id_str;
+                    $item->setMessageUrl($url);
+                    
                     $result_model->addItem($item);
                     $itemCount++;
                 }

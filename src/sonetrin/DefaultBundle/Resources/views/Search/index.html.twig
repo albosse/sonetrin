@@ -27,7 +27,6 @@
                     <a href="{{path('socialnetwork_show',{ 'id':network.id })}}">{{ network.name }}</a>
                 {%endfor%}
             </td>
-            <td>{% if entity.endDate %}{{ entity.endDate|date('Y-m-d') }}{% endif %}</td>
             <td>
                 <a id="run_search_btn-{{entity.id}}" class="btn btn-mini btn-success" href="{{path('search_collect', {'id' : entity.id} )}}" >
                      <i class="icon-step-forward"></i>

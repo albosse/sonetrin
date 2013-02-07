@@ -4,7 +4,7 @@
 <ul class="breadcrumb">
     <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
     <li><a href="{{path('result',{'search':entity.search.id})}}">Results</a> <span class="divider">/</span></li>
-    <li class="active">Show</li>
+    <li class="active">Show ({{entity.socialNetwork.name}})</li>
 </ul>
 
 <header class="jumbotron subhead" id="overview">
@@ -31,19 +31,23 @@
         <tr>
             <th>#</th>
             <th>Date</th>
+            <th>User</th>
             <th>Message</th>
         </tr>
         
         {%for key,entity in items %}
             {%if key < count %}
-            <tr>
+            <tr id="row-{{entity.id}}">
                 <td>{{key+1}}</td>
-                <td style="white-space: nowrap;">{{ entity.created| date('Y-m-d') }}</td>
+                <td style="white-space:nowrap;">{{ entity.created| date('Y-m-d') }}</td>
+                <td><a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
                 <td {%if entity.sentiment == 'positive'%}
                     class="positive-row" 
                     {%elseif entity.sentiment == 'negative'%} 
                     class="negative-row" 
                     {%endif%}>{{ entity.message }}
+
+                   <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
                 </td>
                 </div>
              </tr>
@@ -78,6 +82,19 @@ $(document).ready(function()
         {
                 $('.back-to-top').toggleClass('hidden', direction === "up");
         });
+        
+        $('.deleteMessageBtn').click(function()
+             {     
+                 var item = this.id;
+                 
+                 $.ajax({  
+                    type: "GET",  
+                    url: "/results/deleteItem/item/" + item,
+                    success: function(msg){
+                       $("#row-" + item).remove();
+                    }  
+                     });  
+             });
 });
 
     </script>

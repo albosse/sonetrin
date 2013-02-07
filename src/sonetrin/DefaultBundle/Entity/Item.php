@@ -44,6 +44,13 @@ class Item
      * @ORM\Column(name="author", type="string", length=255)
      */
     private $author;
+    
+       /**
+     * @var string
+     *
+     * @ORM\Column(name="author_id", type="string", length=255, nullable=true)
+     */
+    private $author_id;
 
     /**
      * @var string
@@ -51,6 +58,15 @@ class Item
      * @ORM\Column(name="message", type="text")
      */
     private $message;
+    
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="message_url", type="string", length=255)
+     */
+    private $message_url;
+    
+    
 
     /**
      * @var string
@@ -227,5 +243,51 @@ class Item
     public function getMessageId()
     {
         return $this->message_id;
+    }
+
+    /**
+     * Set author_id
+     *
+     * @param string $authorId
+     * @return Item
+     */
+    public function setAuthorId($authorId)
+    {
+        $this->author_id = $authorId;
+    
+        return $this;
+    }
+
+    /**
+     * Get author_id
+     *
+     * @return string 
+     */
+    public function getAuthorId()
+    {
+        return $this->author_id;
+    }
+
+    /**
+     * Set message_url
+     *
+     * @param string $messageUrl
+     * @return Item
+     */
+    public function setMessageUrl($messageUrl)
+    {
+        $this->message_url = $messageUrl;
+    
+        return $this;
+    }
+
+    /**
+     * Get message_url
+     *
+     * @return string 
+     */
+    public function getMessageUrl()
+    {
+        return $this->message_url;
     }
 }

@@ -144,11 +144,14 @@ class GooglePlusModule implements SocialNetworkInterface
                 {
                     $item = new Item();
                     $item->setAuthor($tweet->actor->displayName);
+                    $item->setAuthorId($tweet->actor->id);
                     $item->setCreated(new \DateTime($tweet->published));
                     $item->setMessage(strip_tags($tweet->object->content));
                     $item->setMessage_id($tweet->id);
                     $item->setResult($result_model);
-                    $item->setSearch($this->search);
+                    $item->setSearch($this->search);                                
+                    $item->setMessageUrl($tweet->url);
+                    
                     $result_model->addItem($item);
                     $itemCount++;
                 }
