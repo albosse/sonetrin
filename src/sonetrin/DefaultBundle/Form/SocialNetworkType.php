@@ -14,7 +14,6 @@ class SocialNetworkType extends AbstractType
             ->add('name')
             ->add('url')
             ->add('authRequired', null, array('required' => false))
-            ->add('language', 'choice', array('choices' => array('en' => 'English','de' => 'German')))
             ->add('api_key',null,array('required' => false))
             ->add('description',null,array('required' => false,
                                                'attr' => array('rows' => '5')))  

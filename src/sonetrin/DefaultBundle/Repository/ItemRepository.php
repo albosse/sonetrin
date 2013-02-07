@@ -17,7 +17,6 @@ class ItemRepository extends EntityRepository
 
     public function findAllItemsBySearch(Search $search, $filter = false, $limit = false)
     {
-
         $query = $this->createQueryBuilder('i');
         $query->where('i.search = :id');
         $query->setParameter('id', $search->getId());
@@ -29,15 +28,13 @@ class ItemRepository extends EntityRepository
             $query->setParameter('filter', $filter);
         }
 
-        if ($limit != false)
-        {
+        if ($limit != false){
             $query->setMaxResults($limit);
         }
 
         $result = $query->getQuery()->getResult();
 
-        if ($filter == 'random')
-        {
+        if ($filter == 'random'){
             $result = shuffle($result);
         }
 

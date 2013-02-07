@@ -16,6 +16,7 @@ class SearchType extends AbstractType
             ->add('endDate',null,array(
                     'required' => false
                 ))
+            ->add('language', 'choice', array('choices' => array('en' => 'English','de' => 'German')))    
             ->add('socialNetwork','entity', array(
                     'class' => 'sonetrinDefaultBundle:SocialNetwork',
                     'property' => 'name',

@@ -122,9 +122,12 @@
                         </tr>
                             {%for key,entity in randomItems %}
                                 {%if key < 20 %}
-                        <tr {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
+                        <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
                             <td>{{ entity.created| date('Y-m-d') }} {{entity.author}}</td>
                             <td>{{ entity.message }}</td>
+                            <td>  
+                                <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
+                            </td>
                             </td>         
                         </tr>
                                {%endif%}
@@ -178,7 +181,19 @@
                     $.ajax({  
                     type: "POST",  
                     url: "{{path('result_analyze',{'search':entity.id} )}}",  
-                    data: "",  
+                    data: "",
+                    beforeSend: function() {
+                       $('#graphs').remove();
+                       $('#analyzeResultsBtn').addClass('disabled');
+                       $('#removeSentimentsBtn').addClass('disabled');
+                       $('#loader').show();
+                    },
+                    complete: function(){
+                       $('#analyzeResultsBtn').removeClass('disabled');
+                       $('#removeSentimentsBtn').removeClass('disabled');
+                       $('#loader').hide();
+                    },
+                    
                     success: function(msg){
                        window.location.reload();
                     }  
@@ -196,25 +211,20 @@
                         window.location.reload();
                     }  
                      });         
-                  });
-          
-                  jQuery.ajaxSetup({
-                   beforeSend: function() {
-                       $('#graphs').remove();
-                       $('#analyzeResultsBtn').addClass('disabled');
-                       $('#removeSentimentsBtn').addClass('disabled');
-                       $('#loader').show();
-                    },
-                    complete: function(){
-                       $('#analyzeResultsBtn').removeClass('disabled');
-                       $('#removeSentimentsBtn').removeClass('disabled');
-                       $('#loader').hide();
-                    },
-                    success: function() {}
-                  });
+                  });      
        
-       
-                  
+             $('.deleteMessageBtn').click(function()
+             {     
+                 var item = this.id;
+                 
+                 $.ajax({  
+                    type: "GET",  
+                    url: "/results/deleteItem/item/" + item,
+                    success: function(msg){
+                       $("#row-" + item).remove();
+                    }  
+                     });  
+             });
        
             </script>    
 

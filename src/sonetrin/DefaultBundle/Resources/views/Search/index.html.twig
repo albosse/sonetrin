@@ -14,7 +14,6 @@
             <th>{{ 'Id'|trans }}</th>
             <th>{{ 'Name'|trans }}</th>
             <th>{{ 'SocialNetwork'|trans }}</th>
-            <th>{{ 'Enddate'|trans }}</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -30,20 +29,10 @@
             </td>
             <td>{% if entity.endDate %}{{ entity.endDate|date('Y-m-d') }}{% endif %}</td>
             <td>
-               {#
-               {% if entity.hasResult  %} 
-                 <a class="btn btn-mini btn-success" href="#modal{{entity.id}}" data-toggle="modal" >
-                     <i class="icon-step-forward"></i>
-                    {{ 'start'|trans }}
-                </a>
-               {%else%}
-                #}
                 <a id="run_search_btn-{{entity.id}}" class="btn btn-mini btn-success" href="{{path('search_collect', {'id' : entity.id} )}}" >
                      <i class="icon-step-forward"></i>
                     {{ 'start'|trans }}
-                 </a>
-               {#{%endif%} #}
-                                          
+                 </a>                                          
                 <a class="btn btn-mini" href="{{ path('search_show', { 'id': entity.id }) }}">
                     <i class="icon-eye-open"></i>
                     {{ 'show'|trans }}
@@ -64,27 +53,7 @@
                     </a>   
                 {% endif%}
             </td>
-        </tr>
-        {#
-        {%if entity.hasResult%}
-        <!-- Modal -->
-            <div id="modal{{entity.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">Really start a new search for "{{entity.name}}"?</h3>
-              </div>
-              <div class="modal-body">
-                <p>There are results available for this search. Starting a new Search will delete all old results.
-                    Do you really want to start a new search?
-                </p>
-              </div>
-              <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <a id="run_search_btn-{{entity.id}}" href="#" class="btn btn-primary">Start a new Search</a>
-              </div>
-            </div>
-        {%endif%} 
-        #}       
+        </tr>      
     {% endfor %}
     </tbody>
 </table>

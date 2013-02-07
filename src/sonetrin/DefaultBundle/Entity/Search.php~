@@ -29,6 +29,13 @@ class Search
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
+    
+    /**
+     * @var string language
+     *
+     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"})
+     */
+    private $language;
 
     /**
      * @var SocialNetwork $socialNetwork
@@ -66,12 +73,16 @@ class Search
     protected $updatedAt;
     
     /**
-     * @var cronjob
-     *
-     * @ORM\OneToOne(targetEntity="Cronjob", cascade={"remove"})
+     * @ORM\OneToOne(targetEntity="Cronjob", mappedBy="search", cascade={"remove"})
      */
     protected $cronjob;
-
+    
+     /**
+     * @ORM\Column(name="executed", type="integer", nullable=true)
+     */
+    protected $executed;
+    
+    
     /**
      * @ORM\prePersist
      */
@@ -301,6 +312,5 @@ class Search
     public function getUpdatedAt()
     {
         return $this->updatedAt;
-    }
-    
+    }   
 }

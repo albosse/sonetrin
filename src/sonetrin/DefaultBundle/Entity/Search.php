@@ -29,6 +29,13 @@ class Search
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
+    
+    /**
+     * @var string language
+     *
+     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"})
+     */
+    private $language = 'en';
 
     /**
      * @var SocialNetwork $socialNetwork
@@ -71,7 +78,7 @@ class Search
     protected $cronjob;
     
      /**
-     * @ORM\Column(name="executed", type="integer")
+     * @ORM\Column(name="executed", type="integer", nullable=true)
      */
     protected $executed;
     
@@ -306,4 +313,73 @@ class Search
     {
         return $this->updatedAt;
     }   
+
+    /**
+     * Set language
+     *
+     * @param string $language
+     * @return Search
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    
+        return $this;
+    }
+
+    /**
+     * Get language
+     *
+     * @return string 
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Set executed
+     *
+     * @param integer $executed
+     * @return Search
+     */
+    public function setExecuted($executed)
+    {
+        $this->executed = $executed;
+    
+        return $this;
+    }
+
+    /**
+     * Get executed
+     *
+     * @return integer 
+     */
+    public function getExecuted()
+    {
+        return $this->executed;
+    }
+
+    /**
+     * Set cronjob
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Cronjob $cronjob
+     * @return Search
+     */
+    public function setCronjob(\sonetrin\DefaultBundle\Entity\Cronjob $cronjob = null)
+    {
+        $this->cronjob = $cronjob;
+    
+        return $this;
+    }
+
+    /**
+     * Get cronjob
+     *
+     * @return \sonetrin\DefaultBundle\Entity\Cronjob 
+     */
+    public function getCronjob()
+    {
+        return $this->cronjob;
+    }
 }

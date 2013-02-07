@@ -12,17 +12,15 @@ use sonetrin\DefaultBundle\Entity\Item;
  */
 class TwitterModule implements SocialNetworkInterface
 {
-
     private $em;
+    /** @var type Search */
     private $search;
-    //json
-    private $results_raw;
-    //array with date:user:text
-    private $rpp = 100;
-    private $pages = 10;
-    private $lang = 'en';
+    /** @var type SocialNetwork */
     private $socialNetwork;
-
+    private $results_raw;     //json
+    private $rpp = 100;
+    private $pages = 15;
+ 
     public function __construct($em, Search $search)
     {
         $this->em = $em;
@@ -31,7 +29,6 @@ class TwitterModule implements SocialNetworkInterface
     }
 
     /**
-     * 
      * @param type $search
      * @return type An array of tweet results
      */
@@ -79,7 +76,7 @@ class TwitterModule implements SocialNetworkInterface
         {
             $url = $this->socialNetwork->getUrl() .
                     $query .
-                    '&lang=' . $this->lang .
+                    '&lang=' .  $this->search->getLanguage() .
 //                    '&until=' . $until .
                     '&rpp=' . $this->rpp .
                     '&page=' . $page;

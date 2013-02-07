@@ -50,12 +50,6 @@ class SocialNetwork
      */
     private $api_key;
 
-    /**
-     * @var string language
-     *
-     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"}, nullable=true)
-     */
-    private $language;
 
     /**
      * @var string $description
@@ -142,29 +136,6 @@ class SocialNetwork
     public function getAuthRequired()
     {
         return $this->authRequired;
-    }
-
-    /**
-     * Set language
-     *
-     * @param string $language
-     * @return SocialNetwork
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-    
-        return $this;
-    }
-
-    /**
-     * Get language
-     *
-     * @return string 
-     */
-    public function getLanguage()
-    {
-        return $this->language;
     }
 
     /**

@@ -15,7 +15,6 @@ class LoadSocialNetworks implements FixtureInterface
         $sn->setName("twitter");
         $sn->setUrl("http://search.twitter.com/search.json?q=");
         $sn->setAuthRequired(false);
-        $sn->setLanguage("en");
         $sn->setDescription("Twitter");
         
         $manager->persist($sn);
@@ -25,7 +24,6 @@ class LoadSocialNetworks implements FixtureInterface
         $sn2->setName('googleplus');
         $sn2->setUrl("https://www.googleapis.com/plus/v1/activities?query=");
         $sn2->setAuthRequired(true);
-        $sn2->setLanguage("en");
         $sn2->setDescription("Twitter");
         $sn2->setApiKey("AIzaSyCrjO168nVV6RCsCMedcr5mEkO96P5bBSE");
         $manager->persist($sn2);

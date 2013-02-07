@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Entity\Keyword;
+use sonetrin\DefaultBundle\Entity\Item;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -24,6 +25,7 @@ class ResultController extends Controller
      */
     public function indexAction(Search $search, $filter)
     {
+
         $em = $this->getDoctrine()->getManager();
         $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search, $filter);
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());
@@ -83,29 +85,26 @@ class ResultController extends Controller
     }
 
     /**
-     * @Route("/test/{search}", name="result_test")
+     * @Route("/deleteItem/item/{item}", name="result_deleteItem", requirements={"item" = "\d+"})
      * @Template()
      */
-    public function testAction(Search $search)
+    public function deleteItemAction($item)
     {
-        require_once __DIR__ . '/../Resources/api/opinion-mining/Example.php';
+        $em = $this->getDoctrine()->getManager();
+        $item = $em->getRepository('sonetrinDefaultBundle:Item')->findOneBy(array('id' => $item));
 
-        $sentences = array();
-        $results = $search->getResult();
-
-        foreach ($results as $result)
+        if (false === is_null($item))
         {
-            $file = $result->getFile();
-
-            foreach ($file as $entity)
-            {
-                $sentences[] = $entity->text;
-            }
+            $em->remove($item);
+            $em->flush();
+            
+            $response = 'Item deleted!';
         }
-
-        $ex = new \Example();
-        $ex->runFile($sentences);
-        return array();
+        else
+        {
+            $response = 'Item not found';
+        }
+        return new Response($response);
     }
 
     /**
@@ -129,7 +128,8 @@ class ResultController extends Controller
         foreach ($items as $item)
         {
             //if item already has a sentiment
-            if (false === is_null($item->getSentiment())){
+            if (false === is_null($item->getSentiment()))
+            {
                 continue;
             }
 
@@ -204,8 +204,8 @@ class ResultController extends Controller
 
         return $this->redirect($this->generateUrl('search'));
     }
-      
-        /**
+
+    /**
      * Analyzes results based on a list of positive and negative keywords
      * 
      * If there are more positive than negative keywords, 
@@ -220,33 +220,33 @@ class ResultController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
-      
+
         //reset counter
         $pos = 0;
         $neg = 0;
-        
-         echo $message . ' : <br />'; 
+
+        echo $message . ' : <br />';
 
         foreach ($keywords as $keyword)
         {
             if (true == preg_match('| [#]*' . preg_quote($keyword->getEnglish()) . '[^-]|i', $message))
-            {             
+            {
                 if ($keyword->getAssociation() == 'positive')
                 {
                     echo preg_quote($keyword->getEnglish()) . ': positive <br />';
                     $pos++;
                 } else
                 {
-                     echo preg_quote($keyword->getEnglish()) . ': negative <br />';
+                    echo preg_quote($keyword->getEnglish()) . ': negative <br />';
                     $neg++;
                 }
             }
         }
-        
+
         echo '<br /><br />';
         echo 'Positive: ' . $pos . '<br />';
         echo 'Negative: ' . $neg;
-        
+
         die;
         return array();
     }
