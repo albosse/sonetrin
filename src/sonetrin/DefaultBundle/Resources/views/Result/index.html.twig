@@ -67,7 +67,7 @@
                         <i class="icon-remove-sign"></i>
                         Remove 
                     </a>
-                    <a class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
+                    <a href="{{path('analysis_exportResultsAsCSV', {'search' : entity.id} )}}" class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
                         <i class="icon-download-alt"></i>
                         Export 
                     </a>
@@ -134,7 +134,7 @@
                                 {%if key < 20 %}
                         <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
                             <td>{{ entity.created| date('Y-m-d') }} <a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
-                            <td>{{ entity.message }}</td>
+                            <td>{{ entity.message|escape }}</td>
                             <td>  
                                 <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
                             </td>

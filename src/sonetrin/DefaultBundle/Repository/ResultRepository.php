@@ -43,5 +43,5 @@ class ResultRepository extends EntityRepository
         }
         return $sentiments;
     }
-
+    
 }

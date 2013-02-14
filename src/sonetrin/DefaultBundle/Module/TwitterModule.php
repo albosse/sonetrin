@@ -81,7 +81,7 @@ class TwitterModule implements SocialNetworkInterface
                     '&rpp=' . $this->rpp .
                     '&page=' . $page;
 
-
+            
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -117,20 +117,24 @@ class TwitterModule implements SocialNetworkInterface
 
         $itemCount = 0;
         foreach ($this->results_raw as $result)
-        {            
+        {   
+            if(false === isset($result->results))
+            {
+                continue;
+            }
             foreach ($result->results as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
-                        ->findBy(array('message_id' => $tweet->id_str,
+                        ->findOneBy(array('message_id' => $tweet->id_str,
                                               'search' => $this->search));
                 
-                if (true === is_null($item_exists) || true == empty($item_exists))
-                {                           
+                if (true === is_null($item_exists))
+                {                       
                     $item = new Item();
                     $item->setAuthor($tweet->from_user);
                     $item->setAuthorId($tweet->from_user_id);
                     $item->setCreated(new \DateTime($tweet->created_at));
-                    $item->setMessage($tweet->text);
+                    $item->setMessage(strip_tags($tweet->text));
                     $item->setMessage_id($tweet->id_str);                  
                     $item->setResult($result_model);
                     $item->setSearch($this->search);

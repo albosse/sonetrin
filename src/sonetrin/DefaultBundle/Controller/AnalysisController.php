@@ -7,13 +7,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Core\SecurityContext;
 use sonetrin\DefaultBundle\Entity\Search;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @Route("/analysis")
  */
 class AnalysisController extends Controller
-{   
-     /**
+{
+
+    /**
      * @Route("/cake/{search}", name="result_cake_graph")
      */
     public function cakeAction(Search $search)
@@ -21,7 +23,7 @@ class AnalysisController extends Controller
         $em = $this->getDoctrine()->getManager();
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')
                 ->findRecordsSentiments($search->getId());
-              
+
         include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
         include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_pie.php");
 
@@ -33,22 +35,22 @@ class AnalysisController extends Controller
         $graph->ClearTheme();
         $graph->SetShadow();
         $graph->SetFrame(false);
-        $graph->SetMargin(10,10,10,10);
-        $graph->title->SetFont(FF_FONT1, FS_BOLD, 20);     
+        $graph->SetMargin(10, 10, 10, 10);
+        $graph->title->SetFont(FF_FONT1, FS_BOLD, 20);
         $graph->legend->SetPos(0.5, 0.8, 'center', 'bottom');
         $graph->legend->SetColumns(3);
         $graph->legend->SetFont(FF_FONT1, FS_BOLD, 24);
 
         $p1 = new \PiePlot($data);
         $p1->SetLegends(array('positive', 'negative', 'neutral'));
-        $p1->SetSliceColors(array('#CCF5CC','#FFB2B2','#EDEDF3'));  
+        $p1->SetSliceColors(array('#CCF5CC', '#FFB2B2', '#EDEDF3'));
 //        $p1->SetSize(0.3);
         $p1->SetCenter(0.5, 0.35);
 
 
         $graph->Add($p1);
         $graph->Stroke();
-        
+
         return array();
     }
 
@@ -106,48 +108,48 @@ class AnalysisController extends Controller
         $graph->SetShadow();
 
         // Grafik anzeigen
-        $graph->Stroke();      
+        $graph->Stroke();
     }
-    
+
     /**
      * @Route("/bar/{search}/{scale}/{start}/{end}", name="result_bar_graph", defaults={"scale" = "month", "start" = "0", "end" = "0"})
      * @Template()
      */
     public function showBarGraphAction(Search $search, $scale, $start, $end)
     {
-       include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
-       include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_bar.php");
-        
-       $em = $this->getDoctrine()->getManager();
-       $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Item')
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph.php");
+        include_once (__DIR__ . "/../Resources/api/jpgraph/src/jpgraph_bar.php");
+
+        $em = $this->getDoctrine()->getManager();
+        $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Item')
                 ->findSentimentsForBarGraph($search, $scale, $start, $end);
-        
-       if(true == empty($sentimentCount))
-       {
-           return false;
-       }
-       
-        foreach($sentimentCount as $date)
+
+        if (true == empty($sentimentCount))
+        {
+            return false;
+        }
+
+        foreach ($sentimentCount as $date)
         {
             $datay1[] = $date['positive'];
             $datay2[] = $date['negative'];
             $datay3[] = $date['neutral'];
-        }   
-      
-        $graph = new \Graph(500,300,'auto');    
+        }
+
+        $graph = new \Graph(500, 300, 'auto');
         $graph->ClearTheme();
         $graph->SetFrame(false);
         $graph->SetScale("textlin");
         $graph->SetShadow();
-        $graph->img->SetMargin(40,30,40,40);
+        $graph->img->SetMargin(40, 30, 40, 40);
         $graph->xaxis->SetTickLabels(array_keys($sentimentCount));
 
 //        $graph->xaxis->title->Set('Year ' . $search->getCreatedAt()->format('Y'));
-        $graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
+        $graph->xaxis->title->SetFont(FF_FONT1, FS_BOLD);
 
 //        $graph->title->Set('Group bar plot');
-        $graph->title->SetFont(FF_FONT1,FS_BOLD);
-                  
+        $graph->title->SetFont(FF_FONT1, FS_BOLD);
+
         $bplot1 = new \BarPlot($datay1);
         $bplot2 = new \BarPlot($datay2);
         $bplot3 = new \BarPlot($datay3);
@@ -164,11 +166,46 @@ class AnalysisController extends Controller
         $bplot2->SetShadow();
         $bplot3->SetShadow();
 
-        $gbarplot = new \GroupBarPlot(array($bplot1,$bplot2,$bplot3));
+        $gbarplot = new \GroupBarPlot(array($bplot1, $bplot2, $bplot3));
         $gbarplot->SetWidth(0.6);
         $graph->Add($gbarplot);
 
         $graph->Stroke();
         return array();
-    }  
+    }
+
+    /**
+     * @Route("/search/{search}/export", name="analysis_exportResultsAsCSV")
+     */
+    public function exportResultsAsCSVAction(Search $search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $sentiments = $em->getRepository('sonetrinDefaultBundle:Result')
+                ->findRecordsSentiments($search->getId());
+
+        $list = array(
+            array('positive', 'negative', 'neutral'),
+            array($sentiments['positive'], $sentiments['negative'], $sentiments['neutral'])
+        );
+        
+        $filename = time() . '_' . 'export.csv';
+
+        $fp = fopen($filename, 'w');
+
+        foreach ($list as $fields)
+        {
+            fputcsv($fp, $fields, ';');
+        }
+
+        fclose($fp);
+        $headers = array(
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="export.csv"'
+        );
+
+
+
+        return new Response(file_get_contents($filename), 200, $headers);
+    }
+
 }
