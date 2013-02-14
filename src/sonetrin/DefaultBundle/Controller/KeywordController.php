@@ -166,6 +166,8 @@ class KeywordController extends Controller
 
         $form = $this->createFormBuilder()
                 ->add('keywords', 'textarea', array('label' => 'Keywords (comma seperated)', 'attr' => array('class' => 'span6', 'rows' => 10)))
+                ->add('language','choice',array('choices' => array('en' => 'English',
+                                                                   'de' => 'German')))
                 ->add('seperation', 'choice', array('expanded' => false,
                     'multiple' => false,
                     'data' => 'comma',
@@ -186,6 +188,7 @@ class KeywordController extends Controller
             $data = $form->getData();
             $keywords = $data['keywords'];
             $seperation = $data['seperation'];
+            $language = $data['language'];
             $em = $this->getDoctrine()->getManager();
             if ($keywords != '')
             {
@@ -209,12 +212,13 @@ class KeywordController extends Controller
                 {
                     $word = trim($word);
 
-                    $item_exists = $em->getRepository('sonetrinDefaultBundle:Keyword')->findOneBy(array('english' => $word));
+                    $item_exists = $em->getRepository('sonetrinDefaultBundle:Keyword')->findOneBy(array('expression' => $word));
 
                     if (is_null($item_exists))
                     {
                         $keyword = new Keyword();
-                        $keyword->setEnglish($word);
+                        $keyword->setExpression($word);
+                        $keyword->setLanguage($language);
                         $keyword->setAssociation($data['association']);
                         $em->persist($keyword);
                         $count++;
@@ -249,9 +253,9 @@ class KeywordController extends Controller
 
         foreach ($keywords as $keyword)
         {
-            echo $keyword->getEnglish() . "<br />";
-            $message= $keyword->getEnglish();
-            $keyword->setEnglish(trim($message));
+            echo $keyword->getExpression() . "<br />";
+            $message= $keyword->getExpression();
+            $keyword->setExpression(trim($message));
             
         }
 

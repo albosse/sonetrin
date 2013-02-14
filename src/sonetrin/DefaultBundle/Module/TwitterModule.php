@@ -17,7 +17,7 @@ class TwitterModule implements SocialNetworkInterface
     private $search;
     /** @var type SocialNetwork */
     private $socialNetwork;
-    private $results_raw;     //json
+    private $results_raw;     
     private $rpp = 100;
     private $pages = 15;
  

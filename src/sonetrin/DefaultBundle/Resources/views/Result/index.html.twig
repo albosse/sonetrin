@@ -5,20 +5,29 @@
     <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
     <li class="active">Results</li>
 </ul>
-
+{#
 <header class="jumbotron subhead" id="overview">
     <div class="container">
         <h1>{{ 'Results'|trans }} for {{entity.name}} </h1>
     </div>
 </header>
 <hr />
+#}
 {% if entity.result|length > 0 %}
 
 <div id="result-content">
 
-    <div id="results-left" class="span5">
-        <table class="table span5">
-            <legend>Search Information</legend>
+    <div id="results-left" class="span6">
+        <table class="table">
+            <legend>Search Information for "{{entity.name}}"</legend>
+              <tr>
+                <td class="label-cell">Query:</td>
+                <td>{{entity.name}}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">Language:</td>
+                <td>{{entity.language}}</td>
+            </tr>
             <tr>
                 <td class="label-cell">Social Networks:</td>
                 <td>
@@ -30,9 +39,10 @@
                                 <td>  
                                     <a class="btn btn-mini" href="{{ path('result_show', { 'id': result.id }) }}">
                                         <i class="icon-eye-open"></i>
-                                    {{ 'show'|trans }}
+                                        Show
                                     </a>
-                                    <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" onclick="return confirm('Really delete this result?')"> 
+                                    <a class="btn btn-mini btn-danger" href="{{path('result_delete',{'id':result.id} )}}" 
+                                       onclick="return confirm('Really delete this result?')"> 
                                         <i class="icon-remove-sign"></i>
                                         Remove
                                     </a>
@@ -52,14 +62,14 @@
                         <i class="icon-screenshot"></i>
                         Analyze Results
                     </a>   
-        {%else%}
-                    <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
-                        <i class="icon-screenshot"></i>
-                        Analyze Results
-                    </a>   
+        {%else%} 
                     <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
                         <i class="icon-remove-sign"></i>
-                        Remove sentiments
+                        Remove 
+                    </a>
+                    <a class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
+                        <i class="icon-download-alt"></i>
+                        Export 
                     </a>
                 </legend>
             
@@ -101,12 +111,12 @@
                </div>
 
          {%endif%}
-                <div id="loader">
+                <div id="loader" class="offset1">
                     <img class="span2" src="{{asset('images/loader.gif')}}" />
                 </div>
             </div>
 
-            <div id="results-right" class="span5 offset1">
+            <div id="results-right" class="span5">
                 <table id="wrapper" class="record_properties table table-condensed">
                     <tbody>
                         <tr>

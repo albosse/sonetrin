@@ -18,7 +18,6 @@ class GooglePlusModule implements SocialNetworkInterface
     //json
     private $results_raw;
     //array with date:user:text
-    private $lang = 'en';
     private $socialNetwork;
     private $maxResults = 20;
     private $cycles = 20;
@@ -70,24 +69,21 @@ class GooglePlusModule implements SocialNetworkInterface
                 $query .= '%20';
             }
         }
-//        $until = $this->search->getEndDate()->format('Y-m-d');
 
         $nextPageToken = '';
 
         for ($page = 1; $page <= $this->cycles; $page++)
         {
-            $url = $this->socialNetwork->getUrl() .
-                    $query;
-            $url .= '&lang=' . $this->lang .
+            $url = $this->socialNetwork->getUrl() . $query;
+            $url .= '&lang=' . $this->search->getLanguage() .
                     //                    '&until=' . $until .
                     $url .= '&maxResults=' . $this->maxResults;
-            if (isset($key))
-            {
+            
+            if (isset($key)){
                 $url .= '&key=' . $key;
             }
 
-            if (isset($nextPageToken))
-            {
+            if (isset($nextPageToken)){
                 $url .= '&pageToken=' . $nextPageToken;
             }
             $ch = curl_init();

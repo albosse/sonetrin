@@ -18,7 +18,7 @@ class KeywordRepository extends EntityRepository
         $query = $this->createQueryBuilder('k')
             ->where('k.association = :association')
             ->setParameter('association', 'positive')
-            ->orderBy('k.english', 'ASC')
+            ->orderBy('k.expression', 'ASC')
             ->getQuery();
         
         return $query->getResult();
@@ -30,7 +30,7 @@ class KeywordRepository extends EntityRepository
         $query = $this->createQueryBuilder('k')
             ->where('k.association = :association')
             ->setParameter('association', 'negative')
-            ->orderBy('k.english', 'ASC')
+            ->orderBy('k.expression', 'ASC')
             ->getQuery();
 
         return $query->getResult();     

@@ -22,11 +22,18 @@ class Keyword
     private $id;
 
     /**
-     * @var string $english
+     * @var string $expression
      *
-     * @ORM\Column(name="english", type="string", length=255)
+     * @ORM\Column(name="expression", type="string", length=255)
      */
-    private $english;
+    private $expression;
+    
+    /**
+     * @var string $language
+     *
+     * @ORM\Column(name="language", type="string", length=2)
+     */
+    private $language;
     
      /**
      * @var string $association
@@ -44,29 +51,6 @@ class Keyword
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set english
-     *
-     * @param string $english
-     * @return Keyword
-     */
-    public function setEnglish($english)
-    {
-        $this->english = $english;
-    
-        return $this;
-    }
-
-    /**
-     * Get english
-     *
-     * @return string 
-     */
-    public function getEnglish()
-    {
-        return $this->english;
     }
 
     /**

@@ -31,8 +31,8 @@
                 {% for key,keyword in positiveKeywords %}
                 <tr>
                     <td>
-                        <a name="pos-{{keyword.english|lower|slice(0, 1)}}"> </a>
-                            {{keyword.english}}
+                        <a name="pos-{{keyword.expression|lower|slice(0, 1)}}"> </a>
+                            {{keyword.expression}}
                     </td>
                     <td>
                         <a href="{{path('keyword_edit',{'id':keyword.id})}}">
@@ -63,8 +63,8 @@
                 {% for keyword in negativeKeywords %}
                     <tr>
                         <td>
-                            <a name="neg-{{keyword.english|lower|slice(0, 1)}}"></a>
-                              {{keyword.english}}
+                            <a name="neg-{{keyword.expression|lower|slice(0, 1)}}"></a>
+                              {{keyword.expression}}
                         </td>
                         <td>
                             <a href="{{path('keyword_edit',{'id':keyword.id})}}">

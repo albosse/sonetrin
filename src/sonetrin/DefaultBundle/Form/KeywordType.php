@@ -23,7 +23,9 @@ class KeywordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
         {
         $builder
-            ->add('english')
+            ->add('expression')
+            ->add('language','choice',array('choices' => array('en' => 'English', 'de' => 'German'),
+                                               'data' => $this->default) )
             ->add('association','choice',array('choices' => array('positive' => 'Positive', 'negative' => 'Negative'),
                                                'data' => $this->default) )
         ;

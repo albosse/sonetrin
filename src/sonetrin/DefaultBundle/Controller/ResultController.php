@@ -121,9 +121,12 @@ class ResultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-//        $results = $em->getRepository('sonetrinDefaultBundle:Result')->findBy(array('search' => $search->getId()));
         $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('search' => $search->getId()));
-        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
+        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findBy(array('language' => $search->getLanguage()));
+        
+        if(true === is_null($keywords)){
+            return new Response('There are no keywords fittong the language for your search (' . $search->getLanguage() .')!');
+        }
 
         foreach ($items as $item)
         {
@@ -141,7 +144,7 @@ class ResultController extends Controller
 
             foreach ($keywords as $keyword)
             {
-                if (true == preg_match('| [#]*' . preg_quote($keyword->getEnglish()) . '[^-]|i', $message))
+                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '[^-]|i', $message))
                 {
                     if ($keyword->getAssociation() == 'positive')
                     {
@@ -218,7 +221,6 @@ class ResultController extends Controller
     public function analyzeOneResultAction($message)
     {
         $em = $this->getDoctrine()->getManager();
-
         $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findAll();
 
         //reset counter
@@ -229,15 +231,15 @@ class ResultController extends Controller
 
         foreach ($keywords as $keyword)
         {
-            if (true == preg_match('| [#]*' . preg_quote($keyword->getEnglish()) . '[^-]|i', $message))
+            if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '[^-]|i', $message))
             {
                 if ($keyword->getAssociation() == 'positive')
                 {
-                    echo preg_quote($keyword->getEnglish()) . ': positive <br />';
+                    echo preg_quote($keyword->getExpression()) . ': positive <br />';
                     $pos++;
                 } else
                 {
-                    echo preg_quote($keyword->getEnglish()) . ': negative <br />';
+                    echo preg_quote($keyword->getExpression()) . ': negative <br />';
                     $neg++;
                 }
             }
@@ -250,5 +252,4 @@ class ResultController extends Controller
         die;
         return array();
     }
-
 }
