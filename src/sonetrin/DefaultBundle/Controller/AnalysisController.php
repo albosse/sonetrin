@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Core\SecurityContext;
 use sonetrin\DefaultBundle\Entity\Search;
 use Symfony\Component\HttpFoundation\Response;
+use sonetrin\DefaultBundle\Entity\Result;
 
 /**
  * @Route("/analysis")
@@ -175,9 +176,9 @@ class AnalysisController extends Controller
     }
 
     /**
-     * @Route("/search/{search}/export", name="analysis_exportResultsAsCSV")
+     * @Route("/search/{search}/exportSentiments", name="analysis_exportSentimentsAsCSV")
      */
-    public function exportResultsAsCSVAction(Search $search)
+    public function exportSentimentsAsCSVAction(Search $search)
     {
         $em = $this->getDoctrine()->getManager();
         $sentiments = $em->getRepository('sonetrinDefaultBundle:Result')
@@ -187,7 +188,7 @@ class AnalysisController extends Controller
             array('positive', 'negative', 'neutral'),
             array($sentiments['positive'], $sentiments['negative'], $sentiments['neutral'])
         );
-        
+
         $filename = time() . '_' . 'export.csv';
 
         $fp = fopen($filename, 'w');
@@ -203,9 +204,167 @@ class AnalysisController extends Controller
             'Content-Disposition' => 'attachment; filename="export.csv"'
         );
 
-
-
         return new Response(file_get_contents($filename), 200, $headers);
     }
+    
+    /**
+     * @Route("/search/{search}/export", name="analysis_exportSearchResultsAsCSV")
+     */
+    public function exportSearchResultAsCSVAction(Search $search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search);
 
+        // Create new PHPExcel object
+        $objPHPExcel = new \PHPExcel();
+
+        // Set properties
+        $objPHPExcel->getProperties()->setCreator("sonetrin");
+        $objPHPExcel->getProperties()->setLastModifiedBy("sonetrin");
+        $objPHPExcel->getProperties()->setTitle("sonetrin export document");
+        $objPHPExcel->getProperties()->setSubject($search->getName());
+
+        // Add data
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Search:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B1', $search->getName());
+        $objPHPExcel->getActiveSheet()->SetCellValue('A2', 'Id:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B2', $search->getId());
+        $objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Created:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B3', $search->getCreatedAt()->format('d.m.Y h:i:s'));
+        $objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Social Network:');
+        
+        foreach($search->getSocialNetwork() as $network)
+        {
+            $networkArray[] = $network->getName();
+        }
+        $objPHPExcel->getActiveSheet()->SetCellValue('B4', implode(',',$networkArray));
+
+        $row = 6;
+        $objPHPExcel->getActiveSheet()->SetCellValue("A$row", 'Created');
+        $objPHPExcel->getActiveSheet()->SetCellValue("B$row", 'Message Id');
+        $objPHPExcel->getActiveSheet()->SetCellValue("C$row", 'Author');
+        $objPHPExcel->getActiveSheet()->SetCellValue("D$row", 'Author Id');
+        $objPHPExcel->getActiveSheet()->SetCellValue("E$row", 'Message');
+        $objPHPExcel->getActiveSheet()->SetCellValue("F$row", 'Message Url');
+        $objPHPExcel->getActiveSheet()->SetCellValue("G$row", 'Sentiment');
+        $objPHPExcel->getActiveSheet()->SetCellValue("H$row", 'Social Network');
+
+        //Mark legend bold
+        $objPHPExcel->getActiveSheet()->getStyle("A1:D4")->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle("A$row:H$row")->getFont()->setBold(true);
+        $row++;
+        
+        //New Cell for each item
+        foreach ($items as $item)
+        {
+            $objPHPExcel->getActiveSheet()->SetCellValue("A$row", $item->getCreated()->format('d.m.Y h:i:s'));
+            $objPHPExcel->getActiveSheet()->SetCellValue("B$row", $item->getMessage_id());
+            $objPHPExcel->getActiveSheet()->SetCellValue("C$row", $item->getAuthor());
+            $objPHPExcel->getActiveSheet()->SetCellValue("D$row", $item->getAuthorId());
+            $objPHPExcel->getActiveSheet()->SetCellValue("E$row", $item->getMessage());
+            $objPHPExcel->getActiveSheet()->SetCellValue("F$row", $item->getMessageUrl());
+            $objPHPExcel->getActiveSheet()->SetCellValue("G$row", $item->getSentiment());
+            $objPHPExcel->getActiveSheet()->SetCellValue("H$row", $item->getResult()->getSocialNetwork()->getName());
+
+            $row++;
+        }
+
+        // Rename sheet
+        $objPHPExcel->getActiveSheet()->setTitle('Data');
+
+        // Save Excel 2007 file
+        $objWriter = new \PHPExcel_Writer_Excel2007($objPHPExcel);
+
+        $filename = 'Export.xlsx';
+        $file_dir = 'export/' . $filename;
+        $objWriter->save($file_dir);
+
+        $response = new Response();
+
+        //set headers
+        $response->headers->set('Content-Type', 'mime/type');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename);
+        $response->setContent(file_get_contents($file_dir));
+        unlink($file_dir);
+        return $response;
+    }
+
+    /**
+     * @Route("/result/{result}/export", name="analysis_exportResultAsCSV")
+     */
+    public function exportResultAsCSVAction(Result $result)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsByResult($result->getId());
+
+        // Create new PHPExcel object
+        $objPHPExcel = new \PHPExcel();
+
+        // Set properties
+        $objPHPExcel->getProperties()->setCreator("sonetrin");
+        $objPHPExcel->getProperties()->setLastModifiedBy("sonetrin");
+        $objPHPExcel->getProperties()->setTitle("sonetrin export document");
+        $objPHPExcel->getProperties()->setSubject($result->getSearch()->getName());
+
+        // Add data
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Search:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B1', $result->getSearch()->getName());
+        $objPHPExcel->getActiveSheet()->SetCellValue('A2', 'Id:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B2', $result->getSearch()->getId());
+        $objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Created:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B3', $result->getCreatedAt()->format('d.m.Y h:i:s'));
+        $objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Social Network:');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B4', $result->getSocialNetwork()->getName());
+
+        $row = 6;
+        $objPHPExcel->getActiveSheet()->SetCellValue("A$row", 'Created');
+        $objPHPExcel->getActiveSheet()->SetCellValue("B$row", 'Message Id');
+        $objPHPExcel->getActiveSheet()->SetCellValue("C$row", 'Author');
+        $objPHPExcel->getActiveSheet()->SetCellValue("D$row", 'Author Id');
+        $objPHPExcel->getActiveSheet()->SetCellValue("E$row", 'Message');
+        $objPHPExcel->getActiveSheet()->SetCellValue("F$row", 'Message Url');
+        $objPHPExcel->getActiveSheet()->SetCellValue("G$row", 'Sentiment');
+        $objPHPExcel->getActiveSheet()->SetCellValue("H$row", 'Social Network');
+
+        //Mark legend bold
+        $objPHPExcel->getActiveSheet()->getStyle("A1:D4")->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle("A$row:H$row")->getFont()->setBold(true);
+        $row++;
+        foreach ($items as $item)
+        {
+            $objPHPExcel->getActiveSheet()->SetCellValue("A$row", $item->getCreated()->format('d.m.Y h:i:s'));
+            $objPHPExcel->getActiveSheet()->SetCellValue("B$row", $item->getMessage_id());
+            $objPHPExcel->getActiveSheet()->SetCellValue("C$row", $item->getAuthor());
+            $objPHPExcel->getActiveSheet()->SetCellValue("D$row", $item->getAuthorId());
+            $objPHPExcel->getActiveSheet()->SetCellValue("E$row", $item->getMessage());
+            $objPHPExcel->getActiveSheet()->SetCellValue("F$row", $item->getMessageUrl());
+            $objPHPExcel->getActiveSheet()->SetCellValue("G$row", $item->getSentiment());
+            $objPHPExcel->getActiveSheet()->SetCellValue("H$row", $result->getSocialNetwork()->getName());
+
+            $row++;
+        }
+
+        // Rename sheet
+        $objPHPExcel->getActiveSheet()->setTitle('Data');
+
+        // Save Excel 2007 file
+        $objWriter = new \PHPExcel_Writer_Excel2007($objPHPExcel);
+
+        $filename = 'Export_' . $result->getSocialNetwork()->getName() . '.xlsx';
+        $file_dir = 'export/' . $filename;
+        $objWriter->save($file_dir);
+
+        $response = new Response();
+
+        //set headers
+        $response->headers->set('Content-Type', 'mime/type');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename);
+        $response->setContent(file_get_contents($file_dir));
+        unlink($file_dir);
+        return $response;
+    }
 }

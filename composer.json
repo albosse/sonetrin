@@ -24,7 +24,8 @@
         "toa/twitter-bootstrap-bundle": "dev-master",
         "gedmo/doctrine-extensions": "2.3.x-dev",
         "basecom/wrapper-bundle": "dev-master",
-        "basecom/cronjob-bundle": "dev-master"
+        "basecom/cronjob-bundle": "dev-master",
+        "phpexcel/phpexcel": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [

@@ -125,7 +125,7 @@ class ResultController extends Controller
         $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findBy(array('language' => $search->getLanguage()));
         
         if(true === is_null($keywords)){
-            return new Response('There are no keywords fittong the language for your search (' . $search->getLanguage() .')!');
+            return new Response('There are no keywords fitting the language for your search (' . $search->getLanguage() .')!');
         }
 
         foreach ($items as $item)
@@ -144,7 +144,7 @@ class ResultController extends Controller
 
             foreach ($keywords as $keyword)
             {
-                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . ' |i', $message))
+                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '\b|i', $message))
                 {
                     if ($keyword->getAssociation() == 'positive')
                     {
@@ -162,7 +162,10 @@ class ResultController extends Controller
             {
                 $item->setSentiment('negative');
             }
+            
+//            echo $message . '<br />' . 'pos: ' . $pos  . '<br />' . 'neg: ' . $neg . '<br /><br/>';
         }
+//        die;
         //Save changes
         $em->flush();
 
@@ -231,7 +234,7 @@ class ResultController extends Controller
 
         foreach ($keywords as $keyword)
         {
-            if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '[^-]|i', $message))
+            if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '\b|i', $message))
             {
                 if ($keyword->getAssociation() == 'positive')
                 {

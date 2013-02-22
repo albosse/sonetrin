@@ -102,4 +102,14 @@ class ItemRepository extends EntityRepository
         return $data;
     }
     
+   public function findAllItemsByResult($result)
+    {
+        $query = $this->createQueryBuilder('i');
+        $query->join('i.result','r');
+        $query->where('r.id = :resultId');
+        $query->setParameter('resultId', $result);
+        $result = $query->getQuery()->getResult();
+
+        return $result;
+    }   
 }

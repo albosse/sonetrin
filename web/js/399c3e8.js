@@ -2040,9 +2040,18 @@ https://github.com/imakewebthings/jquery-waypoints/blob/master/GPL-license.txt
 
 }(window.jQuery);
 $(document).ready(function()
-{ 
-  $("img").error(function(){
-    $(this).hide();     
-    $(this).parent().append('<div id="error">No data available</div>');     
-  });    
-});
+    {
+               
+        $( "#datepicker_start" ).datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+        $( "#datepicker_end" ).datepicker({
+            dateFormat: "yy-mm-dd"
+        });
+           
+              
+        $("img").error(function(){
+            $(this).hide();     
+            $(this).parent().append('<div id="error">No data available</div>');     
+        });    
+    });

@@ -65,9 +65,7 @@ class Item
      * @ORM\Column(name="message_url", type="string", length=255)
      */
     private $message_url;
-    
-    
-
+        
     /**
      * @var string
      *
@@ -88,6 +86,7 @@ class Item
      * @ORM\ManyToOne(targetEntity="Search")
      */
     private $search;
+    
     
     public function getSearch()
     {

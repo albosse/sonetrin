@@ -34,48 +34,21 @@ class TwitterModule implements SocialNetworkInterface
      */
     public function findResults()
     {
-        if (!isset($this->search))
-        {
+        if (!isset($this->search)){
             throw new \Exception("No search available!");
         }
 
         $searchItems = explode(',', $this->search->getName());
         $query = '';
-
-        $lastItem = trim(end($searchItems));
-
-        foreach ($searchItems as $item)
-        {
-            $item = trim($item);
-            if ($item[0] == '#')
-            {
-                $query .= '%23' . str_replace('#', '', $item);
-            } elseif ($item[0] == '@')
-            {
-                $query .= '%40' . str_replace('#', '', $item);
-            } else
-            {
-                $query .= '' . $item;
-            }
-
-            if ($lastItem != $item)
-            {
-                $query .= '+OR+';
-            }
-        }
-
-//        try
-//        {
-//            $until = $this->search->getEndDate()->format('Y-m-d');
-//        } catch (\Exception $e)
-//        {
-//            $until = new \DateTime();
-//        }
-
+        
+        foreach ($searchItems as $item){
+            $query .= ' ' . trim($item);           
+        }       
+        
         for ($page = 1; $page <= $this->pages; $page++)
         {
             $url = $this->socialNetwork->getUrl() .
-                    $query .
+                    urlencode($query) .
                     '&lang=' .  $this->search->getLanguage() .
 //                    '&until=' . $until .
                     '&rpp=' . $this->rpp .

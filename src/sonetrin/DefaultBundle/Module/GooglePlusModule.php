@@ -49,41 +49,27 @@ class GooglePlusModule implements SocialNetworkInterface
         $searchItems = explode(',', $this->search->getName());
         $query = '';
 
-        $lastItem = end($searchItems);
-
         foreach ($searchItems as $item)
         {
-            $item = trim($item);
-            if ($item[0] == '#')
-            {
-                $query .= '%23' . str_replace('#', '', $item);
-            } elseif ($item[0] == '@')
-            {
-                $query .= '%40' . str_replace('#', '', $item);
-            } else
-            {
-                $query .= '' . $item;
-            }
-            if ($lastItem != $item)
-            {
-                $query .= '%20';
-            }
+            $query .= ' ' . trim($item);
         }
 
         $nextPageToken = '';
 
         for ($page = 1; $page <= $this->cycles; $page++)
         {
-            $url = $this->socialNetwork->getUrl() . $query;
-            $url .= '&lang=' . $this->search->getLanguage() .
-                    //                    '&until=' . $until .
-                    $url .= '&maxResults=' . $this->maxResults;
-            
-            if (isset($key)){
+            $url = $this->socialNetwork->getUrl() . urlencode($query);
+            $url .= '&lang=' . $this->search->getLanguage();
+//            $url .=  '&until=' . $until;
+            $url .= '&maxResults=' . $this->maxResults;
+
+            if (isset($key))
+            {
                 $url .= '&key=' . $key;
             }
 
-            if (isset($nextPageToken)){
+            if (isset($nextPageToken))
+            {
                 $url .= '&pageToken=' . $nextPageToken;
             }
             $ch = curl_init();
@@ -114,8 +100,8 @@ class GooglePlusModule implements SocialNetworkInterface
         }
 
         $old_res = $this->em->getRepository('sonetrinDefaultBundle:Result')
-                ->findOneBy(array('search' => $this->search, 
-                           'socialNetwork' => $this->socialNetwork));
+                ->findOneBy(array('search' => $this->search,
+            'socialNetwork' => $this->socialNetwork));
 
 
         if (false === is_null($old_res))
@@ -127,18 +113,20 @@ class GooglePlusModule implements SocialNetworkInterface
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
         }
-        $itemCount = 0;
+
         foreach ($this->results_raw as $results)
         {
-          if(false === isset($result->results))
+
+            if (false === isset($results->items))
             {
                 continue;
             }
+
             foreach ($results->items as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
-                        ->findOneBy(array('message_id' => $tweet->id, 
-                                              'search' => $this->search));
+                        ->findOneBy(array('message_id' => $tweet->id,
+                    'search' => $this->search));
 
                 if (('' != strip_tags($tweet->object->content) && (true === is_null($item_exists))))
                 {
@@ -149,11 +137,10 @@ class GooglePlusModule implements SocialNetworkInterface
                     $item->setMessage(strip_tags($tweet->object->content));
                     $item->setMessage_id($tweet->id);
                     $item->setResult($result_model);
-                    $item->setSearch($this->search);                                
+                    $item->setSearch($this->search);
                     $item->setMessageUrl($tweet->url);
-                    
+
                     $result_model->addItem($item);
-                    $itemCount++;
                 }
             }
         }
@@ -161,6 +148,5 @@ class GooglePlusModule implements SocialNetworkInterface
         $this->em->persist($result_model);
         $this->em->flush();
     }
-
 }
 
