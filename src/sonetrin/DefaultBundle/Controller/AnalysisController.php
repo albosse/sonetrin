@@ -234,12 +234,12 @@ class AnalysisController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Created:');
         $objPHPExcel->getActiveSheet()->SetCellValue('B3', $search->getCreatedAt()->format('d.m.Y h:i:s'));
         $objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Social Network:');
-        
-        foreach($search->getSocialNetwork() as $network)
+
+        foreach ($search->getSocialNetwork() as $network)
         {
             $networkArray[] = $network->getName();
         }
-        $objPHPExcel->getActiveSheet()->SetCellValue('B4', implode(',',$networkArray));
+        $objPHPExcel->getActiveSheet()->SetCellValue('B4', implode(',', $networkArray));
 
         $row = 6;
         $objPHPExcel->getActiveSheet()->SetCellValue("A$row", 'Created');
@@ -255,7 +255,7 @@ class AnalysisController extends Controller
         $objPHPExcel->getActiveSheet()->getStyle("A1:D4")->getFont()->setBold(true);
         $objPHPExcel->getActiveSheet()->getStyle("A$row:H$row")->getFont()->setBold(true);
         $row++;
-        
+
         //New Cell for each item
         foreach ($items as $item)
         {
@@ -367,4 +367,5 @@ class AnalysisController extends Controller
         unlink($file_dir);
         return $response;
     }
+
 }

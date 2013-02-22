@@ -141,6 +141,7 @@ class GooglePlusModule implements SocialNetworkInterface
                     $item->setMessageUrl($tweet->url);
 
                     $result_model->addItem($item);
+                    $result_model->setUpdatedAt();
                 }
             }
         }

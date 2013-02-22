@@ -11,21 +11,11 @@ use sonetrin\DefaultBundle\Entity\SocialNetwork;
  * sonetrin\DefaultBundle\Entity\Result
  *
  * @ORM\Table(name="result")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="sonetrin\DefaultBundle\Repository\ResultRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class Result
 {
-
-    /**
-     * 
-     * @param $network The network name
-     * @param $file The file to create
-     */
-    public function __construct($file)
-    {
-        $this->file = $file;
-    }
 
     /**
      * @var integer $id
@@ -38,9 +28,9 @@ class Result
     
     /**
      *
-     * @var type 
+     * @var integer $item 
      * 
-     * @ORM\OneToMany(targetEntity="Item", mappedBy="result", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Item", mappedBy="result", cascade={"remove", "persist"})
      */
     private $item;
     
@@ -207,4 +197,12 @@ class Result
     {
         return $this->item;
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->item = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
 }

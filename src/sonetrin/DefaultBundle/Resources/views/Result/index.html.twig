@@ -20,7 +20,7 @@
     <div id="results-left" class="span6">
         <table class="table">
             <legend>Search Information for "{{entity.name}}"</legend>
-              <tr>
+            <tr>
                 <td class="label-cell">Query:</td>
                 <td>{{entity.name}}</td>
             </tr>
@@ -44,9 +44,9 @@
                                        onclick="return confirm('Really delete this result?')"> 
                                         <i class="icon-remove-sign"></i>
                                     </a>
-                                     <a title="export" href="{{ path('analysis_exportResultAsCSV', { 'result' : result.id })}}" class="btn btn-mini btn-success"> 
-                                     <i class="icon-download-alt"></i>
-                                     </a>
+                                    <a title="export" href="{{ path('analysis_exportResultAsCSV', { 'result' : result.id })}}" class="btn btn-mini btn-success"> 
+                                        <i class="icon-download-alt"></i>
+                                    </a>
                                 </td>
                             </tr> 
                    {% else%}
@@ -73,9 +73,9 @@
                         Export all
                     </a>
                 </legend>
-            
+
                 <div id="graphs">
-                    
+
                     <div id="pie-graph">
                         <img src="{{path('result_cake_graph', {'search': entity.id } )}}" />
                     </div>
@@ -92,14 +92,14 @@
                             <input placeholder="Start" class="span2" type="text" id="datepicker_start" />
                             <input placeholder="End"  class="span2" type="text" id="datepicker_end" />
                             <a class="btn" id="refreshBarGraphBtn"> 
-                                 <i class=" icon-refresh"></i>
+                                <i class=" icon-refresh"></i>
                             </a>
                         </div>
 
-                    <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
-                </div>  
-                    
-               </div>
+                        <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
+                    </div>  
+
+                </div>
 
          {%endif%}
                 <div id="loader" class="offset1">
@@ -121,119 +121,120 @@
                             <th>Created</th>
                             <th>Message</th>
                         </tr>
-                     </thead>
-                     <tbody>
+                    </thead>
+                    <tbody>
                             {%for key,entity in randomItems %}
                                 {%if key < 20 %}
-                        <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
-                            <td>{{ entity.created| date('Y-m-d') }} <a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
-                            <td>{{ entity.message }}</td>
-                            <td>  
-                                <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
-                            </td>
-                            </td>         
-                        </tr>
+                            <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
+                                <td>{{ entity.created| date('Y-m-d') }} <a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
+                                <td>{{ entity.message }}</td>
+                                <td>  
+                                    <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
+                                </td>
+                                </td>         
+                            </tr>
                                {%endif%}
                             {% endfor %}        
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 {%else%}
-        <p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
+            <p>Sorry, there are no results available! Maybe you should try a more generic search?</p>
 {%endif%}
 
-        <script>
-            $('#loader').hide();                                        
+            <script>
+                $('#loader').hide();                                        
               
-                $('#refreshBarGraphBtn').click(function() 
-                {                   
-                    $('#error').remove(); 
+                    $('#refreshBarGraphBtn').click(function() 
+                    {                   
+                        $('#error').remove(); 
                     
-                    $('#bar-graph-image').fadeOut();
+                        $('#bar-graph-image').fadeOut();
                     
-                    var month =  $('#bar-scale option:selected').text();
-                    var start = $('#datepicker_start').val()
-                    var end   = $('#datepicker_end').val()
+                        var month =  $('#bar-scale option:selected').text();
+                        var start = $('#datepicker_start').val()
+                        var end   = $('#datepicker_end').val()
                     
-                    var url = "/analysis/bar/{{entity.id}}/" + month;
+                        var url = "/analysis/bar/{{entity.id}}/" + month;
                     
-                    if(start != '' && end != '')
-                    {
-                        url += "/" + start + "/" + end;
-                    }else if(start == '' && end != '')
-                    {
-                        url += "/0/" + end;
-                    }else if(start != '' && end == '')
-                    {
-                        url += "/" + start;
-                    }
+                        if(start != '' && end != '')
+                        {
+                            url += "/" + start + "/" + end;
+                        }else if(start == '' && end != '')
+                        {
+                            url += "/0/" + end;
+                        }else if(start != '' && end == '')
+                        {
+                            url += "/" + start;
+                        }
                                                                                   
-                     $('#bar-graph-image').attr('src',url);                  
-                     $('#bar-graph-image').fadeIn();                              
-                });
+                         $('#bar-graph-image').attr('src',url);                  
+                         $('#bar-graph-image').fadeIn();                              
+                    });
                        
-                $('#analyzeResultsBtn').click(function()
-                {       
-                    $.ajax({  
-                    type: "POST",  
-                    url: "{{path('result_analyze',{'search':entity.id} )}}",  
-                    data: "",
-                    beforeSend: function() {
-                       $('#graphs').remove();
-                       $('#analyzeResultsBtn').addClass('disabled');
-                       $('#removeSentimentsBtn').addClass('disabled');
-                       $('#loader').show();
-                    },
-                    complete: function(){
-                       $('#analyzeResultsBtn').removeClass('disabled');
-                       $('#removeSentimentsBtn').removeClass('disabled');
-                       $('#loader').hide();
-                    },
+                    $('#analyzeResultsBtn').click(function()
+                    {       
+                        $.ajax({  
+                        type: "POST",  
+                        url: "{{path('result_analyze',{'search':entity.id} )}}",  
+                        data: "",
+                        beforeSend: function() {
+                           $('#graphs').remove();
+                           $('#analyzeResultsBtn').addClass('disabled');
+                           $('#removeSentimentsBtn').addClass('disabled');
+                           $('#loader').show();
+                        },
+                        complete: function(){
+                           $('#analyzeResultsBtn').removeClass('disabled');
+                           $('#removeSentimentsBtn').removeClass('disabled');
+                           $('#loader').hide();
+                        },
                     
-                    success: function(msg){
-                       window.location.reload();
-                    }  
-                     });  
+                        success: function(msg){
+                           window.location.reload();
+                        }  
+                         });  
         
-                  });
+                      });
                    
-                $('#removeSentimentsBtn').click(function()
-                {       
-                    $.ajax({  
-                    type: "POST",  
-                    url: "{{path('result_removeSentiments',{'search':entity.id} )}}",  
-                    data: "",
-                    beforeSend: function() {
-                       $('#graphs').remove();
-                       $('#analyzeResultsBtn').addClass('disabled');
-                       $('#removeSentimentsBtn').addClass('disabled');
-                       $('#loader').show();
-                    },
-                    complete: function(){
-                       $('#analyzeResultsBtn').removeClass('disabled');
-                       $('#removeSentimentsBtn').removeClass('disabled');
-                       $('#loader').hide();
-                    },
-                    success: function(msg){
-                        window.location.reload();
-                    }  
-                     });         
-                  });      
+                    $('#removeSentimentsBtn').click(function()
+                    {       
+                        $.ajax({  
+                        type: "POST",  
+                        url: "{{path('result_removeSentiments',{'search':entity.id} )}}",  
+                        data: "",
+                        beforeSend: function() {
+                           $('#graphs').remove();
+                           $('#analyzeResultsBtn').addClass('disabled');
+                           $('#removeSentimentsBtn').addClass('disabled');
+                           $('#loader').show();
+                        },
+                        complete: function(){
+                           $('#analyzeResultsBtn').removeClass('disabled');
+                           $('#removeSentimentsBtn').removeClass('disabled');
+                           $('#loader').hide();
+                        },
+                        success: function(msg){
+                            window.location.reload();
+                        }  
+                         });       
+                     
+                    });      
        
-             $('.deleteMessageBtn').click(function()
-             {     
-                 var item = this.id;
+                 $('.deleteMessageBtn').click(function()
+                 {     
+                     var item = this.id;
                  
-                 $.ajax({  
-                    type: "GET",  
-                    url: "/results/deleteItem/item/" + item,
-                    success: function(msg){
-                       $("#row-" + item).remove();
-                    }  
-                     });  
-             });
+                     $.ajax({  
+                        type: "GET",  
+                        url: "/results/deleteItem/item/" + item,
+                        success: function(msg){
+                           $("#row-" + item).remove();
+                        }  
+                         });  
+                 });
                    
-            </script>    
+                </script>    
 
 {% endblock %}

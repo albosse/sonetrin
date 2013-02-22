@@ -88,7 +88,6 @@ class TwitterModule implements SocialNetworkInterface
             $result_model->setSocialNetwork($this->socialNetwork);
         }
 
-        $itemCount = 0;
         foreach ($this->results_raw as $result)
         {   
             if(false === isset($result->results))
@@ -116,7 +115,8 @@ class TwitterModule implements SocialNetworkInterface
                     $item->setMessageUrl($url);
                     
                     $result_model->addItem($item);
-                    $itemCount++;
+                    $result_model->setUpdatedAt();
+
                 }
             }
         }

@@ -197,4 +197,12 @@ class Result
     {
         return $this->item;
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->item = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
 }

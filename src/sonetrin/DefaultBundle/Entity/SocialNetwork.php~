@@ -50,12 +50,6 @@ class SocialNetwork
      */
     private $api_key;
 
-    /**
-     * @var string language
-     *
-     * @ORM\Column(name="language", type="string", length=2, options={"default" = "en"}, nullable=true)
-     */
-    private $language;
 
     /**
      * @var string $description
@@ -145,29 +139,6 @@ class SocialNetwork
     }
 
     /**
-     * Set language
-     *
-     * @param string $language
-     * @return SocialNetwork
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-    
-        return $this;
-    }
-
-    /**
-     * Get language
-     *
-     * @return string 
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
      * Set description
      *
      * @param string $description
@@ -188,5 +159,28 @@ class SocialNetwork
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Set api_key
+     *
+     * @param string $apiKey
+     * @return SocialNetwork
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->api_key = $apiKey;
+    
+        return $this;
+    }
+
+    /**
+     * Get api_key
+     *
+     * @return string 
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
     }
 }

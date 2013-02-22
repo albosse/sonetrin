@@ -98,4 +98,50 @@ class Keyword
     {
         return $this->association;
     }
+
+    /**
+     * Set expression
+     *
+     * @param string $expression
+     * @return Keyword
+     */
+    public function setExpression($expression)
+    {
+        $this->expression = $expression;
+    
+        return $this;
+    }
+
+    /**
+     * Get expression
+     *
+     * @return string 
+     */
+    public function getExpression()
+    {
+        return $this->expression;
+    }
+
+    /**
+     * Set language
+     *
+     * @param string $language
+     * @return Keyword
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    
+        return $this;
+    }
+
+    /**
+     * Get language
+     *
+     * @return string 
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
 }
