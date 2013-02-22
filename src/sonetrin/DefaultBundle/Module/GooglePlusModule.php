@@ -130,6 +130,10 @@ class GooglePlusModule implements SocialNetworkInterface
         $itemCount = 0;
         foreach ($this->results_raw as $results)
         {
+          if(false === isset($result->results))
+            {
+                continue;
+            }
             foreach ($results->items as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')

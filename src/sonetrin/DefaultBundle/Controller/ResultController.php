@@ -144,7 +144,7 @@ class ResultController extends Controller
 
             foreach ($keywords as $keyword)
             {
-                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '[^-]|i', $message))
+                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . ' |i', $message))
                 {
                     if ($keyword->getAssociation() == 'positive')
                     {

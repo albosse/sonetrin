@@ -18,7 +18,7 @@ class CronjobType extends AbstractType
             ->add('frequency','choice',array('choices' => array('hourly' => 'hourly',
                                                                 'daily'  => 'daily',
                                                                'monthly' =>'monthly')))
-            ->add('active')
+            ->add('active',null,array('required' => false))
         ;
     }
 
