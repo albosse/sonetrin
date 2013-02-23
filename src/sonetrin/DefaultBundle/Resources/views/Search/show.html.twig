@@ -16,21 +16,38 @@
         <tr>
             <th>Language</th>
             <td>{{ entity.language }}</td>
-        </tr>
-        <tr>
-            <th>Results</th>
+        </tr>    
+         <tr>
+            <th>Social Networks</th>
             <td>
-                <ul>
-               {%for result in entity.result %}
-                   <li>
-                   {{ result.createdAt|date('Y-m-d') }} | {{ result.socialNetwork.name }} |  {{ result.item|length }} entries
-                   </li>
-               {%endfor%}
-                </ul>        
+                {%for result in entity.result %}
+                    {{result.socialNetwork.name}} 
+                 {%endfor%}            
             </td>
-        </tr>
+        </tr>  
     </tbody>
 </table>
+
+<table class="record_properties table table-bordered table-condensed table-striped">
+    <legend>Results</legend>
+    <tr>
+        <th>Created</th>
+        <th>Updated</th>
+        <th>Social Network</th>
+        <th>Entries</th>
+        <th>Log</th>
+    </tr>
+{%for result in entity.result %}
+   <tr>
+       <td> {{ result.createdAt|date('Y-m-d h:i') }}</td>
+       <td> {{ result.updatedAt|date('Y-m-d h:i') }}</td>
+       <td> {{ result.socialNetwork.name }} </td>
+       <td> {{ result.item|length }} </td>
+       <td><a class="btn btn-link" href="{{path('result_log', {'id' : result.id }) }}">Show</a></td>
+   </tr>
+{%endfor%}
+</table>        
+
 
     <p>
         <a class="btn" href="{{ path('search_edit', { 'id': entity.id }) }}">

@@ -57,6 +57,13 @@ class Result
      * @ORM\Column(name="updated_at", type="datetime", nullable=false)
      */
     protected $updatedAt;
+    
+    /**
+     * @var log
+     *
+     * @ORM\OneToMany(targetEntity="Log", mappedBy="result", cascade={"persist","remove"})
+     */
+    private $log;
 
     /**
      *
@@ -205,4 +212,50 @@ class Result
         $this->item = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
+    
+    /**
+     * Set log
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Log $log
+     * @return Search
+     */
+    public function setLog(\sonetrin\DefaultBundle\Entity\Log $log = null)
+    {
+        $this->log = $log;
+    
+        return $this;
+    }
+
+    /**
+     * Get log
+     *
+     * @return \sonetrin\DefaultBundle\Entity\Log 
+     */
+    public function getLog()
+    {
+        return $this->log;
+    }
+
+    /**
+     * Add log
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Log $log
+     * @return Result
+     */
+    public function addLog(\sonetrin\DefaultBundle\Entity\Log $log)
+    {
+        $this->log[] = $log;
+    
+        return $this;
+    }
+
+    /**
+     * Remove log
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Log $log
+     */
+    public function removeLog(\sonetrin\DefaultBundle\Entity\Log $log)
+    {
+        $this->log->removeElement($log);
+    }
 }

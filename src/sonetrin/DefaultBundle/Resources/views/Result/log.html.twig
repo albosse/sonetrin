@@ -1,0 +1,59 @@
+{% extends 'sonetrinDefaultBundle::layout.html.twig' %}
+{% block content %}
+
+<ul class="breadcrumb">
+    <li><a href="{{path('search')}}">Search</a> <span class="divider">/</span></li>
+    <li><a href="{{path('result',{'search':entity.search.id})}}">Results</a> <span class="divider">/</span></li>
+    <li class="active">Log</li>
+</ul>
+
+<header class="jumbotron subhead" id="overview">
+    <div class="container">
+        <h1>{{ 'Show Logs'|trans }}</h1>
+    </div>
+</header>
+<hr />
+
+<table id="wrapper" class="record_properties table table-bordered table-condensed">
+    <tbody>        
+        <tr>
+            <th>#</th>
+            <th>Created at</th>
+            <th>Notice</th>
+        </tr>
+        
+        {%for log in entity.log %}
+            <tr>
+                <td>{{log.id}}</td>
+                <td>{{log.createdAt| date('Y-m-d') }}</td>
+                <td>{{log.notice}}</td>
+             </tr>
+        {%endfor%}
+    </tbody>
+</table>
+
+<a href="#" class="back-to-top" onclick="goToByScroll('top')">
+    <i class="icon-chevron-up icon-white"></i><br />
+    Back to <br />Top
+</a>   
+
+<script>
+     
+function goToByScroll(id){
+ $('html,body').animate({scrollTop: $("#"+id).offset().top},'slow');
+}
+
+
+$(document).ready(function() 
+{
+        $('.back-to-top').addClass('hidden');
+        $.waypoints.settings.scrollThrottle = 50;
+        $('#wrapper').waypoint(function(event, direction) 
+        {
+                $('.back-to-top').toggleClass('hidden', direction === "up");
+        });
+});
+
+    </script>
+
+{% endblock %}

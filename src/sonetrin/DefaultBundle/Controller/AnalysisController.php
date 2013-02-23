@@ -206,7 +206,7 @@ class AnalysisController extends Controller
 
         return new Response(file_get_contents($filename), 200, $headers);
     }
-    
+
     /**
      * @Route("/search/{search}/export", name="analysis_exportSearchResultsAsCSV")
      */
@@ -270,6 +270,16 @@ class AnalysisController extends Controller
 
             $row++;
         }
+        /*
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+        */
 
         // Rename sheet
         $objPHPExcel->getActiveSheet()->setTitle('Data');
@@ -348,6 +358,17 @@ class AnalysisController extends Controller
             $row++;
         }
 
+        /*
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setAutoSize(true);
+        */
+        
         // Rename sheet
         $objPHPExcel->getActiveSheet()->setTitle('Data');
 
@@ -366,6 +387,58 @@ class AnalysisController extends Controller
         $response->setContent(file_get_contents($file_dir));
         unlink($file_dir);
         return $response;
+    }
+
+    /**
+     * @Route("/search/{search}/tagcloud", name="analysis_generateTagcloud")
+     */
+    public function generateTagcloud(Search $search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search);
+
+        $tagsArray = array();
+
+        foreach ($items as $item)
+        {
+            $message = $item->getMessage();
+
+            $matches = array();
+            preg_match_all('/#\S*\w/i', $message, $matches);
+
+            foreach ($matches[0] as $tag)
+            {
+                if (isset($tagsArray[$tag]))
+                {
+                    $tagsArray[$tag]++;
+                } else
+                {
+                    $tagsArray[$tag] = 1;
+                }
+            }
+        }
+
+        //The best 50 results
+        arsort($tagsArray);
+        $tagWeights = array_slice($tagsArray, 0, 50);
+
+        // Shuffle the tags
+        uksort($tagWeights, function() {
+                    return rand() > rand();
+                });
+
+        $max = max($tagWeights);
+
+
+        // Max of 5 weights
+        $multiplier = ($max > 5) ? 5 / $max : 1;
+        foreach ($tagWeights as &$tag)
+        {
+            $tag = ceil($tag * $multiplier);
+        }
+
+        $return = json_encode($tagWeights); //jscon encode the array
+        return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
     }
 
 }

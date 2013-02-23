@@ -6,6 +6,7 @@ use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Module\SocialNetworkInterface;
 use sonetrin\DefaultBundle\Entity\Item;
+use sonetrin\DefaultBundle\Entity\Log;
 
 /**
  * Module to perform all Twitter specific operations
@@ -113,6 +114,9 @@ class GooglePlusModule implements SocialNetworkInterface
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
         }
+        
+        //count all inserts
+        $countInserts = 0;
 
         foreach ($this->results_raw as $results)
         {
@@ -121,13 +125,13 @@ class GooglePlusModule implements SocialNetworkInterface
             {
                 continue;
             }
-
+            
             foreach ($results->items as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
                         ->findOneBy(array('message_id' => $tweet->id,
                     'search' => $this->search));
-
+                
                 if (('' != strip_tags($tweet->object->content) && (true === is_null($item_exists))))
                 {
                     $item = new Item();
@@ -141,11 +145,15 @@ class GooglePlusModule implements SocialNetworkInterface
                     $item->setMessageUrl($tweet->url);
 
                     $result_model->addItem($item);
-                    $result_model->setUpdatedAt();
+                    $countInserts++;
                 }
             }
         }
-
+        $log = new Log();
+        $log->setResult($result_model);
+        $log->setNotice('Items added: ' . $countInserts);
+        $result_model->addLog($log);
+           
         $this->em->persist($result_model);
         $this->em->flush();
     }

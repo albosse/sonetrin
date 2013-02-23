@@ -255,4 +255,18 @@ class ResultController extends Controller
         die;
         return array();
     }
+    
+    
+    /**
+     * @Route("/log/{id}", name="result_log", requirements={"id" = "\d+"})
+     * @Template()
+     */
+    public function logAction(Result $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $result = $em->getRepository('sonetrinDefaultBundle:Result')->find($id->getId());
+        
+        return array('entity' => $result);
+    }
+
 }

@@ -6,6 +6,7 @@ use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Entity\Result;
 use sonetrin\DefaultBundle\Module\SocialNetworkInterface;
 use sonetrin\DefaultBundle\Entity\Item;
+use sonetrin\DefaultBundle\Entity\Log;
 
 /**
  * Module to perform all Twitter specific operations
@@ -87,13 +88,19 @@ class TwitterModule implements SocialNetworkInterface
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
         }
-
+        
+        //count all inserts
+        $countInserts = 0;
+            
+        //for each page
         foreach ($this->results_raw as $result)
         {   
-            if(false === isset($result->results))
-            {
+            //if no results for this page were found
+            if(false === isset($result->results)){
                 continue;
             }
+                        
+            //each tweet
             foreach ($result->results as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
@@ -115,11 +122,16 @@ class TwitterModule implements SocialNetworkInterface
                     $item->setMessageUrl($url);
                     
                     $result_model->addItem($item);
-                    $result_model->setUpdatedAt();
-
+                    $countInserts++;    
                 }
             }
         }
+        
+        $log = new Log();
+        $log->setResult($result_model);
+        $log->setNotice('Items added: ' . $countInserts);
+        $result_model->addLog($log);
+        
         $this->em->persist($result_model);
         $this->em->flush();
 

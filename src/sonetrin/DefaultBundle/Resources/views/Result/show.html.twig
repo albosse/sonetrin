@@ -25,8 +25,11 @@
                <a id="positive-filter" href="{{path('result_show',{'id' : entity.id,'count' : count, 'filter' : 'positive'})}}">positive</a> - 
                <a id="negative-filter" href="{{path('result_show',{'id' : entity.id,'count' : count, 'filter' : 'negative'})}}">negative</a> - 
                <a href="{{path('result_show',{'id' : entity.id, 'count' : count, 'filter' : 'random'})}}">random</a>
+               <a title="show log" href="{{ path('result_log', { 'id' : entity.id })}}" class="btn btn-mini"> 
+                  <i class="icon-book"></i>
+               </a>
                <a title="export" href="{{ path('analysis_exportResultAsCSV', { 'result' : entity.id })}}" class="btn btn-mini btn-success"> 
-                       <i class="icon-download-alt"></i>
+                  <i class="icon-download-alt"></i>
                </a>
            </td>
        </tr>

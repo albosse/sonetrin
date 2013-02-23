@@ -55,33 +55,38 @@
                         </table>
                     </td>
                 </tr> 
+               <tr>
+                <td class="label-cell">Sentiments:</td>
+                <td>      
+                    {% if sentimentCount['positive'] == 0 and sentimentCount['negative'] == 0%}
+                                <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
+                                    <i class="icon-screenshot"></i>
+                                    Analyze Results
+                                </a>   
+                    {%else%} 
+                                <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
+                                    <i class="icon-remove-sign"></i>
+                                    Remove 
+                                </a>
+                                <a href="{{path('analysis_exportSearchResultsAsCSV', {'search' : entity.id} )}}" class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
+                                    <i class="icon-download-alt"></i>
+                                    Export all
+                                </a>
+                    {%endif%}    
+                 </td>
+              </tr>
             </table>
-
-            <legend>Sentiments
-        {% if sentimentCount['positive'] == 0 and sentimentCount['negative'] == 0%}
-                    <a class="btn btn-mini btn-primary" id="analyzeResultsBtn"> 
-                        <i class="icon-screenshot"></i>
-                        Analyze Results
-                    </a>   
-        {%else%} 
-                    <a class="btn btn-mini btn-danger" id="removeSentimentsBtn"  onclick="return confirm('Really remove all sentiments for this search?')"> 
-                        <i class="icon-remove-sign"></i>
-                        Remove 
-                    </a>
-                    <a href="{{path('analysis_exportSearchResultsAsCSV', {'search' : entity.id} )}}" class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
-                        <i class="icon-download-alt"></i>
-                        Export all
-                    </a>
-                </legend>
-
+       
+       {% if sentimentCount['positive'] != 0 and sentimentCount['negative'] != 0%}             
                 <div id="graphs">
 
                     <div id="pie-graph">
+                        <legend>Positive/Negative ratio</legend>
                         <img src="{{path('result_cake_graph', {'search': entity.id } )}}" />
                     </div>
 
                     <div id="bar-graph">
-
+                        <legend>Sentiment analysis</legend>    
                         <div id="bar-interval" class="row">                                             
                             <select id="bar-scale" class="span2">
                                 <option>day</option>
@@ -97,11 +102,13 @@
                         </div>
 
                         <img id="bar-graph-image" src="{{path('result_bar_graph', {'search': entity.id, 'scale': 'month' } )}}" />
-                    </div>  
-
+                    </div>                      
                 </div>
-
          {%endif%}
+                    <div id="tagcloud">
+                     <legend>Tag Cloud</legend>    
+                    </div>
+            
                 <div id="loader" class="offset1">
                     <img class="span2" src="{{asset('images/loader.gif')}}" />
                 </div>
@@ -233,6 +240,34 @@
                            $("#row-" + item).remove();
                         }  
                          });  
+                 });
+                 
+                 $(function()
+                 {
+                     $.ajax({  
+                        type: "POST",  
+                        url: "{{path('analysis_generateTagcloud',{'search':entity.id} )}}",  
+                        beforeSend: function() {
+                           $('#loader').show();
+                        },
+                        complete: function(){
+                           $('#loader').hide();
+                        },
+                        success: function(result){
+                           
+                           //tag cloud erstellen und einfügen
+                           
+                           var tagcloud = '<section class="section"><p class="tags">';
+                           
+                           for(var item in result)
+                           {
+                                tagcloud += '<span class="weight-' + result[item] + '">' + item +  '</span> ';
+                           }
+                           tagcloud += '</p></section>';
+                           $('#tagcloud').append(tagcloud);
+                        }  
+                         });       
+                     
                  });
                    
                 </script>    

@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks
  */
 class Log
 {
@@ -24,16 +25,17 @@ class Log
     /**
      * @var search
      *
-     * @ORM\OneToOne(targetEntity="Search", inversedBy="log")
+     * @ORM\ManyToOne(targetEntity="Result", inversedBy="log")
      */
-    private $search;
+    private $result;
 
-    /**
-     * @var \DateTime
+     /**
      *
-     * @ORM\Column(name="date", type="date")
+     * @ORM\Column(name="createdAt", type="datetime", nullable=false)
+     * @param \DateTime $createdAt
+     * @return Log
      */
-    private $date;
+    private $createdAt;
     
     
      /**
@@ -52,52 +54,6 @@ class Log
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set search
-     *
-     * @param string $search
-     * @return Log
-     */
-    public function setSearch($search)
-    {
-        $this->search = $search;
-    
-        return $this;
-    }
-
-    /**
-     * Get search
-     *
-     * @return string 
-     */
-    public function getSearch()
-    {
-        return $this->search;
-    }
-
-    /**
-     * Set date
-     *
-     * @param \DateTime $date
-     * @return Log
-     */
-    public function setDate($date)
-    {
-        $this->date = $date;
-    
-        return $this;
-    }
-
-    /**
-     * Get date
-     *
-     * @return \DateTime 
-     */
-    public function getDate()
-    {
-        return $this->date;
     }
 
     /**
@@ -121,5 +77,53 @@ class Log
     public function getNotice()
     {
         return $this->notice;
+    }
+
+    /**
+     * Set result
+     *
+     * @param \sonetrin\DefaultBundle\Entity\Result $result
+     * @return Log
+     */
+    public function setResult(\sonetrin\DefaultBundle\Entity\Result $result = null)
+    {
+        $this->result = $result;
+    
+        return $this;
+    }
+
+    /**
+     * Get result
+     *
+     * @return \sonetrin\DefaultBundle\Entity\Result 
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * Set createdAt
+     * 
+     * @ORM\PrePersist()
+     * 
+     * @param \DateTime $createdAt
+     * @return Log
+     */
+    public function setCreatedAt()
+    {
+        $this->createdAt = new \DateTime();
+    
+        return $this;
+    }
+
+    /**
+     * Get createdAt
+     *
+     * @return \DateTime 
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
     }
 }

@@ -21,10 +21,11 @@
             url: "{{path('search_runAjax',{'id':entity.id} )}}",  
             success: function(msg){
                window.location = "{{path('result',{'search':entity.id} )}}";
-            }
-            error: 
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
                 var msg = '<div class="error">An error occurred. Please try again later.</div>';
                 $(msg).insertAfter($('#loader'));
+             }
            }); 
 
        });

@@ -81,14 +81,7 @@ class Search
      * @ORM\Column(name="executed", type="integer", nullable=true)
      */
     protected $executed;
-    
-    /**
-     * @var log
-     *
-     * @ORM\OneToOne(targetEntity="Log", mappedBy="search")
-     */
-    private $log;
-    
+     
     
     /**
      * @ORM\prePersist
@@ -390,26 +383,4 @@ class Search
         return $this->cronjob;
     }
 
-    /**
-     * Set log
-     *
-     * @param \sonetrin\DefaultBundle\Entity\Log $log
-     * @return Search
-     */
-    public function setLog(\sonetrin\DefaultBundle\Entity\Log $log = null)
-    {
-        $this->log = $log;
-    
-        return $this;
-    }
-
-    /**
-     * Get log
-     *
-     * @return \sonetrin\DefaultBundle\Entity\Log 
-     */
-    public function getLog()
-    {
-        return $this->log;
-    }
 }
