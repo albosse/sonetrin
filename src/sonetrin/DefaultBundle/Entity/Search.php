@@ -48,15 +48,6 @@ class Search
      */
     private $socialNetwork;
 
-
-    /**
-     * @var \DateTime $endDate
-     *
-     * @ORM\Column(name="endDate", type="date", nullable=true)
-     */
-    private $endDate;
-
-
     /**
      * @ORM\OneToMany(targetEntity="Result", mappedBy="search", cascade={"remove"}, orphanRemoval=true)
      */
@@ -131,29 +122,6 @@ class Search
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Set endDate
-     *
-     * @param \DateTime $endDate
-     * @return Search
-     */
-    public function setEndDate($endDate)
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    /**
-     * Get endDate
-     *
-     * @return \DateTime 
-     */
-    public function getEndDate()
-    {
-        return $this->endDate;
     }
 
     /**

@@ -401,13 +401,13 @@ class AnalysisController extends Controller
 
         foreach ($items as $item)
         {
-            $message = $item->getMessage();
+            $message = utf8_encode($item->getMessage());
 
             $matches = array();
-            preg_match_all('/#\S*\w/i', $message, $matches);
+            preg_match_all('/(#\w+)/', $message, $matches);
 
             foreach ($matches[0] as $tag)
-            {
+            {               
                 if (isset($tagsArray[$tag]))
                 {
                     $tagsArray[$tag]++;
@@ -436,7 +436,7 @@ class AnalysisController extends Controller
         {
             $tag = ceil($tag * $multiplier);
         }
-
+       
         $return = json_encode($tagWeights); //jscon encode the array
         return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
     }

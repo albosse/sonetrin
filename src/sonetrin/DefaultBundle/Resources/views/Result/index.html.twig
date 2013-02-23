@@ -68,11 +68,13 @@
                                     <i class="icon-remove-sign"></i>
                                     Remove 
                                 </a>
-                                <a href="{{path('analysis_exportSearchResultsAsCSV', {'search' : entity.id} )}}" class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
-                                    <i class="icon-download-alt"></i>
-                                    Export all
-                                </a>
-                    {%endif%}    
+                   {%endif%}       
+                        
+                    <a href="{{path('analysis_exportSearchResultsAsCSV', {'search' : entity.id} )}}" class="btn btn-mini btn-success" id="exportSentimentsBtn"> 
+                        <i class="icon-download-alt"></i>
+                        Export all
+                    </a>
+ 
                  </td>
               </tr>
             </table>
@@ -105,13 +107,14 @@
                     </div>                      
                 </div>
          {%endif%}
-                    <div id="tagcloud">
-                     <legend>Tag Cloud</legend>    
-                    </div>
             
-                <div id="loader" class="offset1">
-                    <img class="span2" src="{{asset('images/loader.gif')}}" />
-                </div>
+        <div id="tagcloud">
+         <legend>Tag Cloud</legend>    
+        </div>
+            
+        <div id="loader" class="offset1">
+            <img class="span2" src="{{asset('images/loader.gif')}}" />
+        </div>
             </div>
 
             <div id="results-right" class="span5">
@@ -254,9 +257,7 @@
                            $('#loader').hide();
                         },
                         success: function(result){
-                           
-                           //tag cloud erstellen und einfügen
-                           
+                           //tag cloud erstellen und einfügen                          
                            var tagcloud = '<section class="section"><p class="tags">';
                            
                            for(var item in result)
@@ -265,7 +266,12 @@
                            }
                            tagcloud += '</p></section>';
                            $('#tagcloud').append(tagcloud);
-                        }  
+                        },
+                         error: function (xhr, ajaxOptions, thrownError) {
+             
+                            var msg = '<div>No Tag Cloud available.</div>';       
+                            $(msg).insertAfter($('#loader'));
+                         }
                          });       
                      
                  });

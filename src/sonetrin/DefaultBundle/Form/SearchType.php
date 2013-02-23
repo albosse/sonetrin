@@ -13,9 +13,6 @@ class SearchType extends AbstractType
     {
         $builder
             ->add('name',null,array('label' => 'Search'))
-            ->add('endDate',null,array(
-                    'required' => false
-                ))
             ->add('language', 'choice', array('choices' => array('en' => 'English','de' => 'German')))    
             ->add('socialNetwork','entity', array(
                     'class' => 'sonetrinDefaultBundle:SocialNetwork',
