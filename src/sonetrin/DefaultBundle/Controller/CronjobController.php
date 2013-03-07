@@ -8,10 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use sonetrin\DefaultBundle\Entity\Cronjob;
 use sonetrin\DefaultBundle\Form\CronjobType;
-use sonetrin\DefaultBundle\Module\TwitterModule;
-use sonetrin\DefaultBundle\Module\GooglePlusModule;
-use sonetrin\DefaultBundle\Entity\Result;
-use sonetrin\DefaultBundle\Entity\Search;
+use Symfony\Component\HttpFoundation\Response;
+
 
 /**
  * Cronjob controller.
@@ -49,14 +47,15 @@ class CronjobController extends Controller
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Cronjob')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Cronjob entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
+            'entity' => $entity,
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -70,11 +69,11 @@ class CronjobController extends Controller
     public function newAction()
     {
         $entity = new Cronjob();
-        $form   = $this->createForm(new CronjobType(), $entity);
+        $form = $this->createForm(new CronjobType(), $entity);
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         );
     }
 
@@ -87,12 +86,13 @@ class CronjobController extends Controller
      */
     public function createAction()
     {
-        $entity  = new Cronjob();
+        $entity = new Cronjob();
         $request = $this->getRequest();
-        $form    = $this->createForm(new CronjobType(), $entity);
+        $form = $this->createForm(new CronjobType(), $entity);
         $form->bindRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid())
+        {
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
@@ -102,7 +102,7 @@ class CronjobController extends Controller
 
         return array(
             'entity' => $entity,
-            'form'   => $form->createView(),
+            'form' => $form->createView(),
         );
     }
 
@@ -118,7 +118,8 @@ class CronjobController extends Controller
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Cronjob')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Cronjob entity.');
         }
 
@@ -126,8 +127,8 @@ class CronjobController extends Controller
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -145,18 +146,20 @@ class CronjobController extends Controller
 
         $entity = $em->getRepository('sonetrinDefaultBundle:Cronjob')->find($id);
 
-        if (!$entity) {
+        if (!$entity)
+        {
             throw $this->createNotFoundException('Unable to find Cronjob entity.');
         }
 
-        $editForm   = $this->createForm(new CronjobType(), $entity);
+        $editForm = $this->createForm(new CronjobType(), $entity);
         $deleteForm = $this->createDeleteForm($id);
 
         $request = $this->getRequest();
 
         $editForm->bindRequest($request);
 
-        if ($editForm->isValid()) {
+        if ($editForm->isValid())
+        {
             $em->persist($entity);
             $em->flush();
 
@@ -164,8 +167,8 @@ class CronjobController extends Controller
         }
 
         return array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
+            'entity' => $entity,
+            'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         );
     }
@@ -183,11 +186,13 @@ class CronjobController extends Controller
 
         $form->bindRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid())
+        {
             $em = $this->getDoctrine()->getManager();
             $entity = $em->getRepository('sonetrinDefaultBundle:Cronjob')->find($id);
 
-            if (!$entity) {
+            if (!$entity)
+            {
                 throw $this->createNotFoundException('Unable to find Cronjob entity.');
             }
 
@@ -201,12 +206,12 @@ class CronjobController extends Controller
     private function createDeleteForm($id)
     {
         return $this->createFormBuilder(array('id' => $id))
-            ->add('id', 'hidden')
-            ->getForm()
+                        ->add('id', 'hidden')
+                        ->getForm()
         ;
     }
-    
-     /**
+
+    /**
      * Runs a Cronjob .
      *
      * @Route("/run", name="cronjob_run")
@@ -214,54 +219,55 @@ class CronjobController extends Controller
      */
     public function runAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();       
         $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
+        
         $cronlog = array();
-        foreach($cronjobs as $cronjob)
+        foreach ($cronjobs as $cronjob)
         {
             $now = new \DateTime();
             $lastRun = $cronjob->getLastRun();
-            if(is_null($lastRun))
+            if (is_null($lastRun))
             {
                 $lastRun = new \DateTime('2000-01-01');
             }
-                       
-            switch($cronjob->getFrequency())
+
+            switch ($cronjob->getFrequency())
             {
                 case 'hourly':
-                    
-                  $mustRun = $lastRun->add(new \DateInterval('PT1H'));
 
-                    if($mustRun < $now)
+                    $mustRun = $lastRun->add(new \DateInterval('PT1H'));
+
+                    if ($mustRun < $now)
                     {
                         //perform cronjob
                         $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
                         //update lastRun
                         $cronjob->setLastRun($now);
                         //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.'; 
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
                     }
                     break;
-                
+
                 case 'daily':
                     $mustRun = $lastRun->add(new \DateInterval('P1D'));
 
-                    if($mustRun < $now)
+                    if ($mustRun < $now)
                     {
-                       //perform cronjob
+                        //perform cronjob
 //                        $this->searchAction($cronjob->getSearch()->getId());
                         $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
                         //update lastRun
                         $cronjob->setLastRun($now);
                         //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.'; 
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
                     }
                     break;
-                
+
                 case 'monthly':
                     $mustRun = $lastRun->add(new \DateInterval('P1M'));
 
-                    if($lastRun < $now)
+                    if ($lastRun < $now)
                     {
                         //perform cronjob
 //                       $this->searchAction($cronjob->getSearch()->getId());
@@ -269,15 +275,97 @@ class CronjobController extends Controller
                         //update lastRun
                         $cronjob->setLastRun($now);
                         //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.'; 
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
                     }
-                    
+
                     break;
             }
-        }       
+        }
         $em->flush();
+
+        if (empty($cronlog))
+        {
+            $cronlog[] = "No cronjob needed to be run.";
+        }
         
-        echo (json_encode($cronlog));
-        die;
+        $return = json_encode($cronlog); //jscon encode the array
+        return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
+    }
+    
+    
+    
+    public function cronjobRun(\Symfony\Component\DependencyInjection\Container $container)
+    {   
+        $em =  $container->get('doctrine')->getManager();             
+        $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
+    
+        $cronlog = array();
+        foreach ($cronjobs as $cronjob)
+        {
+            $now = new \DateTime();
+            $lastRun = $cronjob->getLastRun();
+            if (is_null($lastRun))
+            {
+                $lastRun = new \DateTime('2000-01-01');
+            }
+
+            switch ($cronjob->getFrequency())
+            {
+                case 'hourly':
+
+                    $mustRun = $lastRun->add(new \DateInterval('PT1H'));
+
+                    if ($mustRun < $now)
+                    {
+                        //perform cronjob
+                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
+                        //update lastRun
+                        $cronjob->setLastRun($now);
+                        //Logfile
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
+                    }
+                    break;
+
+                case 'daily':
+                    $mustRun = $lastRun->add(new \DateInterval('P1D'));
+
+                    if ($mustRun < $now)
+                    {
+                        //perform cronjob
+//                        $this->searchAction($cronjob->getSearch()->getId());
+                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
+                        //update lastRun
+                        $cronjob->setLastRun($now);
+                        //Logfile
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
+                    }
+                    break;
+
+                case 'monthly':
+                    $mustRun = $lastRun->add(new \DateInterval('P1M'));
+
+                    if ($lastRun < $now)
+                    {
+                        //perform cronjob
+//                       $this->searchAction($cronjob->getSearch()->getId());
+                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
+                        //update lastRun
+                        $cronjob->setLastRun($now);
+                        //Logfile
+                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
+                    }
+
+                    break;
+            }
+        }
+        $em->flush();
+
+        if (empty($cronlog))
+        {
+            $cronlog[] = "No cronjob needed to be run.";
+        }
+        
+        $return = json_encode($cronlog); //jscon encode the array
+        return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
     }
 }

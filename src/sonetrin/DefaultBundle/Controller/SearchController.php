@@ -312,7 +312,6 @@ class SearchController extends Controller
         $em->refresh($search);
         return $this->forward('sonetrinDefaultBundle:Result:analyzeResults', array('search' =>  $search->getId()));
         
-//        return $this->redirect($this->generateUrl('result_analyze', array('search' => $search->getId())));  
     }
 
     private function getTwitterResults($search)

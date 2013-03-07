@@ -15,6 +15,10 @@
           <tag name="search_controller" />
         </service>
         
+        <service id="cronjob_controller" class="sonetrin\DefaultBundle\Controller\CronjobController">
+          <argument type="service" id="service_container" />
+        </service>
+        
   </services>
   
   

@@ -74,10 +74,6 @@
               type: "GET",  
               url: "{{path('cronjob_run')}}",  
               success: function(msg){
-                  if(msg == '[]')
-                  {
-                      msg = 'No cronjobs needed to be done.';
-                  }
                  $('<div id="cronlog" class="well"> ' + msg + '</div>').insertAfter($('#loader'));
               }  
              });             

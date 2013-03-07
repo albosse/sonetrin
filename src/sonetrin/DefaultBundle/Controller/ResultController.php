@@ -163,9 +163,8 @@ class ResultController extends Controller
                 $item->setSentiment('negative');
             }
             
-//            echo $message . '<br />' . 'pos: ' . $pos  . '<br />' . 'neg: ' . $neg . '<br /><br/>';
         }
-//        die;
+
         //Save changes
         $em->flush();
 

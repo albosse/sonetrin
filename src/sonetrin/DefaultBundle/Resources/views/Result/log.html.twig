@@ -25,7 +25,7 @@
         {%for log in entity.log %}
             <tr>
                 <td>{{log.id}}</td>
-                <td>{{log.createdAt| date('Y-m-d') }}</td>
+                <td>{{log.createdAt| date('Y-m-d H:m:s') }}</td>
                 <td>{{log.notice}}</td>
              </tr>
         {%endfor%}

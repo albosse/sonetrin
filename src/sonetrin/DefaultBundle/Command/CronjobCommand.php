@@ -7,10 +7,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use basecom\WrapperBundle\ContainerAware\ContainerAwareCommand;
+use sonetrin\DefaultBundle\Module\GooglePlusModule;
+use sonetrin\DefaultBundle\Module\TwitterModule;
+use Symfony\Component\HttpFoundation\Response;
+use sonetrin\DefaultBundle\Entity\Search;
 
-use sonetrin\DefaultBundle\Controller\CronjobController;
 
-class CronjobCommand extends Command
+class CronjobCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
@@ -22,7 +26,134 @@ class CronjobCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $em = $this->getEntityManager();             
+        $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
+           
+        foreach ($cronjobs as $cronjob)
+        {
+            $now = new \DateTime();
+            $lastRun = $cronjob->getLastRun();
+            
+            if (is_null($lastRun))
+            {
+                $lastRun = new \DateTime('2000-01-01');
+            }
+
+            switch ($cronjob->getFrequency())
+            {
+                case 'hourly':
+                    $mustRun = $lastRun->add(new \DateInterval('PT1H'));
+                    break;
+
+                case 'daily':
+                    $mustRun = $lastRun->add(new \DateInterval('P1D'));
+                    break;
+
+                case 'monthly':
+                    $mustRun = $lastRun->add(new \DateInterval('P1M'));
+                    break;
+            }
+            
+             if ($mustRun < $now)
+            {
+                $output->write('Performing search for "' . $cronjob->getSearch()->getName() . '"...');
+                //perform cronjob
+                $this->runAjaxAction($cronjob->getSearch()->getId());
+                //update lastRun
+                $cronjob->setLastRun($now);
+                //Logfile
+                $output->writeln('done');
+            }
+        }
+        $em->flush();
+        $output->writeln("All cronjobs finished.");             
     }
+    
+    private function runAjaxAction($id)
+    {    
+        $em = $this->getEntityManager();
+        $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
+               
+        foreach($search->getSocialNetwork() as $sn)
+        {
+            switch($sn->getName())
+            {
+                case 'twitter':
+                   $status = $this->getTwitterResults($search);    
+                break;  
+                case 'googleplus':
+                   $status = $this->getGooglePlusResults($search);
+                break;
+            }
+        }
+        
+        $em->refresh($search);
+        return $this->analyzeResultsAction($search);
+        
+    }
+
+    private function getTwitterResults($search)
+    {
+        $em = $this->getEntityManager();
+        $tm = new TwitterModule($em, $search);
+        $tm->findResults();
+    }
+
+    private function getGooglePlusResults($search)
+    {
+        $em = $this->getEntityManager();
+        $gpm = new GooglePlusModule($em, $search);
+        $gpm->findResults();
+    }
+    
+    private function analyzeResultsAction(Search $search)
+    {
+        $em = $this->getEntityManager();
+
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('search' => $search->getId()));
+        $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findBy(array('language' => $search->getLanguage()));
+        
+        if(true === is_null($keywords)){
+//            return new Response('There are no keywords fitting the language for your search (' . $search->getLanguage() .')!');
+            return;
+        }
+
+        foreach ($items as $item)
+        {
+            //if item already has a sentiment
+            if (false === is_null($item->getSentiment())){
+                continue;
+            }
+
+            $message = $item->getMessage();
+
+            //reset counter
+            $pos = 0;
+            $neg = 0;
+
+            foreach ($keywords as $keyword)
+            {
+                if (true == preg_match('| [#]*' . preg_quote($keyword->getExpression()) . '\b|i', $message))
+                {
+                    if ($keyword->getAssociation() == 'positive')
+                    {
+                        $pos++;
+                    } else
+                    {
+                        $neg++;
+                    }
+                }
+            }
+            if ($pos > $neg){
+                $item->setSentiment('positive');
+            } elseif ($pos < $neg){
+                $item->setSentiment('negative');
+            }          
+        }
+        
+        $em->flush();
+        return new Response('finished');
+    }  
 }
 
 ?>
