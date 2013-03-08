@@ -10,7 +10,6 @@ use sonetrin\DefaultBundle\Entity\Cronjob;
 use sonetrin\DefaultBundle\Form\CronjobType;
 use Symfony\Component\HttpFoundation\Response;
 
-
 /**
  * Cronjob controller.
  *
@@ -207,8 +206,7 @@ class CronjobController extends Controller
     {
         return $this->createFormBuilder(array('id' => $id))
                         ->add('id', 'hidden')
-                        ->getForm()
-        ;
+                        ->getForm();
     }
 
     /**
@@ -219,9 +217,9 @@ class CronjobController extends Controller
      */
     public function runAction()
     {
-        $em = $this->getDoctrine()->getManager();       
+        $em = $this->getDoctrine()->getManager();
         $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
-        
+
         $cronlog = array();
         foreach ($cronjobs as $cronjob)
         {
@@ -235,50 +233,26 @@ class CronjobController extends Controller
             switch ($cronjob->getFrequency())
             {
                 case 'hourly':
-
                     $mustRun = $lastRun->add(new \DateInterval('PT1H'));
-
-                    if ($mustRun < $now)
-                    {
-                        //perform cronjob
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
                     break;
 
                 case 'daily':
                     $mustRun = $lastRun->add(new \DateInterval('P1D'));
-
-                    if ($mustRun < $now)
-                    {
-                        //perform cronjob
-//                        $this->searchAction($cronjob->getSearch()->getId());
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
                     break;
 
                 case 'monthly':
                     $mustRun = $lastRun->add(new \DateInterval('P1M'));
-
-                    if ($lastRun < $now)
-                    {
-                        //perform cronjob
-//                       $this->searchAction($cronjob->getSearch()->getId());
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
-
                     break;
+            }
+
+            if ($mustRun < $now)
+            {
+                //perform cronjob
+                $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
+                //update lastRun
+                $cronjob->setLastRun($now);
+                //Logfile
+                $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
             }
         }
         $em->flush();
@@ -287,85 +261,9 @@ class CronjobController extends Controller
         {
             $cronlog[] = "No cronjob needed to be run.";
         }
-        
+
         $return = json_encode($cronlog); //jscon encode the array
         return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
     }
-    
-    
-    
-    public function cronjobRun(\Symfony\Component\DependencyInjection\Container $container)
-    {   
-        $em =  $container->get('doctrine')->getManager();             
-        $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
-    
-        $cronlog = array();
-        foreach ($cronjobs as $cronjob)
-        {
-            $now = new \DateTime();
-            $lastRun = $cronjob->getLastRun();
-            if (is_null($lastRun))
-            {
-                $lastRun = new \DateTime('2000-01-01');
-            }
 
-            switch ($cronjob->getFrequency())
-            {
-                case 'hourly':
-
-                    $mustRun = $lastRun->add(new \DateInterval('PT1H'));
-
-                    if ($mustRun < $now)
-                    {
-                        //perform cronjob
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
-                    break;
-
-                case 'daily':
-                    $mustRun = $lastRun->add(new \DateInterval('P1D'));
-
-                    if ($mustRun < $now)
-                    {
-                        //perform cronjob
-//                        $this->searchAction($cronjob->getSearch()->getId());
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
-                    break;
-
-                case 'monthly':
-                    $mustRun = $lastRun->add(new \DateInterval('P1M'));
-
-                    if ($lastRun < $now)
-                    {
-                        //perform cronjob
-//                       $this->searchAction($cronjob->getSearch()->getId());
-                        $response = $this->forward('sonetrinDefaultBundle:Search:runAjax', array('id' => $cronjob->getSearch()->getId()));
-                        //update lastRun
-                        $cronjob->setLastRun($now);
-                        //Logfile
-                        $cronlog[] = 'Cronjob ' . $cronjob->getSearch()->getName() . ' done.';
-                    }
-
-                    break;
-            }
-        }
-        $em->flush();
-
-        if (empty($cronlog))
-        {
-            $cronlog[] = "No cronjob needed to be run.";
-        }
-        
-        $return = json_encode($cronlog); //jscon encode the array
-        return new Response($return, 200, array('Content-Type' => 'application/json')); //make sure it has the correct content type
-    }
 }
