@@ -12,28 +12,33 @@ use sonetrin\DefaultBundle\Module\GooglePlusModule;
 use sonetrin\DefaultBundle\Module\TwitterModule;
 use Symfony\Component\HttpFoundation\Response;
 use sonetrin\DefaultBundle\Entity\Search;
-
+use sonetrin\DefaultBundle\Module\FacebookModule;
 
 class CronjobCommand extends ContainerAwareCommand
 {
+
+    private $output;
+
     protected function configure()
     {
         $this
-            ->setName('sonetrin:cronjob:run')
-            ->setDescription('Run Cronjobs')
+                ->setName('sonetrin:cronjob:run')
+                ->setDescription('Run Cronjobs')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->getEntityManager();             
+        $this->output = $output;
+
+        $em = $this->getEntityManager();
         $cronjobs = $em->getRepository('sonetrinDefaultBundle:Cronjob')->findBy(array('active' => true));
-           
+
         foreach ($cronjobs as $cronjob)
         {
             $now = new \DateTime();
             $lastRun = $cronjob->getLastRun();
-            
+
             if (is_null($lastRun))
             {
                 $lastRun = new \DateTime('2000-01-01');
@@ -53,8 +58,8 @@ class CronjobCommand extends ContainerAwareCommand
                     $mustRun = $lastRun->add(new \DateInterval('P1M'));
                     break;
             }
-            
-             if ($mustRun < $now)
+
+            if ($mustRun < $now)
             {
                 $output->write('Performing search for "' . $cronjob->getSearch()->getName() . '"...');
                 //perform cronjob
@@ -66,30 +71,32 @@ class CronjobCommand extends ContainerAwareCommand
             }
         }
         $em->flush();
-        $output->writeln("All cronjobs finished.");             
+        $output->writeln("All cronjobs finished.");
     }
-    
+
     private function runAjaxAction($id)
-    {    
+    {
         $em = $this->getEntityManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
-               
-        foreach($search->getSocialNetwork() as $sn)
+
+        foreach ($search->getSocialNetwork() as $sn)
         {
-            switch($sn->getName())
+            switch ($sn->getName())
             {
                 case 'twitter':
-                   $status = $this->getTwitterResults($search);    
-                break;  
+                    $status = $this->getTwitterResults($search);
+                    break;
                 case 'googleplus':
-                   $status = $this->getGooglePlusResults($search);
+                    $status = $this->getGooglePlusResults($search);
+                    break;
+                case 'facebook':
+                   $status = $this->getFacebookResults($search);
                 break;
             }
         }
-        
+
         $em->refresh($search);
         return $this->analyzeResultsAction($search);
-        
     }
 
     private function getTwitterResults($search)
@@ -106,22 +113,33 @@ class CronjobCommand extends ContainerAwareCommand
         $gpm->findResults();
     }
     
+     private function getFacebookResults($search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $fbm = new FacebookModule($em, $search);
+        $fbm->findResults();
+    }
+
     private function analyzeResultsAction(Search $search)
     {
+        $this->output->write('analyzing results...');
         $em = $this->getEntityManager();
 
-        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('search' => $search->getId()));
+        $items = $em->getRepository('sonetrinDefaultBundle:Item')->findBy(array('search' => $search->getId(), 'sentiment' => null));
+
         $keywords = $em->getRepository('sonetrinDefaultBundle:Keyword')->findBy(array('language' => $search->getLanguage()));
-        
-        if(true === is_null($keywords)){
-//            return new Response('There are no keywords fitting the language for your search (' . $search->getLanguage() .')!');
+
+        if (true === is_null($keywords))
+        {
+            $this->output->writeln('There are no keywords fitting the language for your search.');
             return;
         }
 
         foreach ($items as $item)
         {
             //if item already has a sentiment
-            if (false === is_null($item->getSentiment())){
+            if (false === is_null($item->getSentiment()))
+            {
                 continue;
             }
 
@@ -144,16 +162,22 @@ class CronjobCommand extends ContainerAwareCommand
                     }
                 }
             }
-            if ($pos > $neg){
+            if ($pos > $neg)
+            {
                 $item->setSentiment('positive');
-            } elseif ($pos < $neg){
+            } elseif ($pos < $neg)
+            {
                 $item->setSentiment('negative');
-            }          
+            } else
+            {
+                $item->setSentiment('neutral');
+            }
         }
-        
+
         $em->flush();
         return new Response('finished');
-    }  
+    }
+
 }
 
 ?>

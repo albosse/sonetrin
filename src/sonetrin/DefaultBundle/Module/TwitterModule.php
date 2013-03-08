@@ -108,7 +108,7 @@ class TwitterModule implements SocialNetworkInterface
                                               'search' => $this->search));
                 
                 if (true === is_null($item_exists))
-                {                       
+                {           
                     $item = new Item();
                     $item->setAuthor($tweet->from_user);
                     $item->setAuthorId($tweet->from_user_id);

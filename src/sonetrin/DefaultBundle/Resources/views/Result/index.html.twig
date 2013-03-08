@@ -137,7 +137,7 @@
                                 {%if key < 20 %}
                             <tr id="row-{{entity.id}}" {%if entity.sentiment == 'positive'%} class="positive-row" {%elseif entity.sentiment == 'negative'%} class="negative-row" {%endif%}>
                                 <td>{{ entity.created| date('Y-m-d') }} <a href="{{entity.messageUrl}}">{{entity.author}}</a></td>
-                                <td>{{ entity.message }}</td>
+                                <td class="span2">{{ entity.message|slice(0,140) }}{% if entity.message|length > 140 %} [...]{%endif%}</td>
                                 <td>  
                                     <button type="button" id="{{entity.id}}" class="close deleteMessageBtn">&times;</button>
                                 </td>

@@ -130,12 +130,6 @@ class ResultController extends Controller
 
         foreach ($items as $item)
         {
-            //if item already has a sentiment
-            if (false === is_null($item->getSentiment()))
-            {
-                continue;
-            }
-
             $message = $item->getMessage();
 
             //reset counter
@@ -162,6 +156,10 @@ class ResultController extends Controller
             {
                 $item->setSentiment('negative');
             }
+            else
+            {
+                $item->setSentiment('neutral');
+            }
             
         }
 
@@ -169,7 +167,6 @@ class ResultController extends Controller
         $em->flush();
 
         return new Response('finished');
-//         return $this->redirect($this->generateUrl('result', array('search' => $search->getId())));
     }
 
     /**

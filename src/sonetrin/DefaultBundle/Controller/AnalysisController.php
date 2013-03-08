@@ -232,7 +232,7 @@ class AnalysisController extends Controller
         $objPHPExcel->getActiveSheet()->SetCellValue('A2', 'Id:');
         $objPHPExcel->getActiveSheet()->SetCellValue('B2', $search->getId());
         $objPHPExcel->getActiveSheet()->SetCellValue('A3', 'Created:');
-        $objPHPExcel->getActiveSheet()->SetCellValue('B3', $search->getCreatedAt()->format('d.m.Y h:i:s'));
+        $objPHPExcel->getActiveSheet()->SetCellValue('B3', $search->getCreatedAt()->format('d.m.Y H:i:s'));
         $objPHPExcel->getActiveSheet()->SetCellValue('A4', 'Social Network:');
 
         foreach ($search->getSocialNetwork() as $network)
@@ -259,7 +259,7 @@ class AnalysisController extends Controller
         //New Cell for each item
         foreach ($items as $item)
         {
-            $objPHPExcel->getActiveSheet()->SetCellValue("A$row", $item->getCreated()->format('d.m.Y h:i:s'));
+            $objPHPExcel->getActiveSheet()->SetCellValue("A$row", $item->getCreated()->format('d.m.Y H:i:s'));
             $objPHPExcel->getActiveSheet()->SetCellValue("B$row", $item->getMessage_id());
             $objPHPExcel->getActiveSheet()->SetCellValue("C$row", $item->getAuthor());
             $objPHPExcel->getActiveSheet()->SetCellValue("D$row", $item->getAuthorId());

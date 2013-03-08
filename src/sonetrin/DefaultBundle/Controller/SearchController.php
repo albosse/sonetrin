@@ -10,6 +10,7 @@ use sonetrin\DefaultBundle\Entity\Search;
 use sonetrin\DefaultBundle\Form\SearchType;
 use sonetrin\DefaultBundle\Module\TwitterModule;
 use sonetrin\DefaultBundle\Module\GooglePlusModule;
+use sonetrin\DefaultBundle\Module\FacebookModule;
 
 /**
  * Search controller.
@@ -266,7 +267,6 @@ class SearchController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);
-//        $search->removeAllResults();
         
         foreach($search->getSocialNetwork() as $sn)
         {
@@ -277,6 +277,9 @@ class SearchController extends Controller
                 break;  
                 case 'googleplus':
                    $status = $this->getGooglePlusResults($search);
+                break;
+                case 'facebook':
+                   $status = $this->getFacebookResults($search);
                 break;
             }
         }
@@ -306,6 +309,9 @@ class SearchController extends Controller
                 case 'googleplus':
                    $status = $this->getGooglePlusResults($search);
                 break;
+                case 'facebook':
+                   $status = $this->getFacebookResults($search);
+                break;
             }
         }
         
@@ -327,5 +333,11 @@ class SearchController extends Controller
         $gpm = new GooglePlusModule($em, $search);
         $gpm->findResults();
     }
-
+    
+    private function getFacebookResults($search)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $fbm = new FacebookModule($em, $search);
+        $fbm->findResults();
+    }
 }
