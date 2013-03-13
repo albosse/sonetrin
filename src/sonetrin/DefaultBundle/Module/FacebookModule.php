@@ -65,13 +65,12 @@ class FacebookModule implements SocialNetworkInterface
                 $url = $this->socialNetwork->getUrl() .
                         urlencode($query) .
                         '&type=post';
-                if(isset($this->accessToken))
+                if (isset($this->accessToken))
                 {
                     $url.= '&access_token=' . $this->accessToken;
                 }
-
             }
-                        
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -82,8 +81,8 @@ class FacebookModule implements SocialNetworkInterface
             $this->results_raw[] = $result;
 
             $nextPageToken = isset($result->paging->next) ? $result->paging->next : '';
-            
-            if(false === isset($result->paging->next))
+
+            if (false === isset($result->paging->next))
             {
                 break;
             }
@@ -135,21 +134,26 @@ class FacebookModule implements SocialNetworkInterface
 
                 if (true === is_null($item_exists))
                 {
-                    $item = new Item();
-                    $item->setAuthor($tweet->from->name);
-                    $item->setAuthorId($tweet->from->id);
-                    $item->setCreated(new \DateTime($tweet->created_time));
-                    $item->setMessage(strip_tags($tweet->message));
-                    $item->setMessage_id($tweet->id);
-                    $item->setResult($result_model);
-                    $item->setSearch($this->search);
+                    try
+                    {
+                        $item = new Item();
+                        $item->setAuthor($tweet->from->name);
+                        $item->setAuthorId($tweet->from->id);
+                        $item->setCreated(new \DateTime($tweet->created_time));
+                        $item->setMessage(strip_tags($tweet->message));
+                        $item->setMessage_id($tweet->id);
+                        $item->setResult($result_model);
+                        $item->setSearch($this->search);
 
-                    $urlArray = explode('_',$tweet->id);
-                    $item->setMessageUrl('http://www.facebook.com/' . $urlArray[0] . '/posts/' . $urlArray[1]);
-                    
+                        $urlArray = explode('_', $tweet->id);
+                        $item->setMessageUrl('http://www.facebook.com/' . $urlArray[0] . '/posts/' . $urlArray[1]);
 
-                    $result_model->addItem($item);
-                    $countInserts++;
+                        $result_model->addItem($item);
+                        $countInserts++;
+                    } catch (\Exception $e)
+                    {
+                        
+                    }
                 }
             }
         }
@@ -166,7 +170,7 @@ class FacebookModule implements SocialNetworkInterface
     }
 
     private function getAccessToken()
-    {        
+    {
         $url = "https://graph.facebook.com/oauth/access_token?client_id=569606039730365&client_secret=137d69d3b4352ce3dc1ac0a9d29f78b8&grant_type=client_credentials";
 
         $ch = curl_init();
@@ -176,17 +180,16 @@ class FacebookModule implements SocialNetworkInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         $result = curl_exec($ch);
-        
-        preg_match('|access_token=(.*)|', $result,$matches);
-        
-        if(isset($matches[1]))
+
+        preg_match('|access_token=(.*)|', $result, $matches);
+
+        if (isset($matches[1]))
         {
-            return $matches[1];  
-        }
-        else
+            return $matches[1];
+        } else
         {
             return '';
         }
-              
     }
+
 }

@@ -114,7 +114,7 @@ class GooglePlusModule implements SocialNetworkInterface
             $result_model->setSearch($this->search);
             $result_model->setSocialNetwork($this->socialNetwork);
         }
-        
+
         //count all inserts
         $countInserts = 0;
 
@@ -125,27 +125,33 @@ class GooglePlusModule implements SocialNetworkInterface
             {
                 continue;
             }
-            
+
             foreach ($results->items as $tweet)
             {
                 $item_exists = $this->em->getRepository('sonetrinDefaultBundle:Item')
                         ->findOneBy(array('message_id' => $tweet->id,
                     'search' => $this->search));
-                
+
                 if (('' != strip_tags($tweet->object->content) && (true === is_null($item_exists))))
                 {
-                    $item = new Item();
-                    $item->setAuthor($tweet->actor->displayName);
-                    $item->setAuthorId($tweet->actor->id);
-                    $item->setCreated(new \DateTime($tweet->published));
-                    $item->setMessage(strip_tags($tweet->object->content));
-                    $item->setMessage_id($tweet->id);
-                    $item->setResult($result_model);
-                    $item->setSearch($this->search);
-                    $item->setMessageUrl($tweet->url);
+                    try
+                    {
+                        $item = new Item();
+                        $item->setAuthor($tweet->actor->displayName);
+                        $item->setAuthorId($tweet->actor->id);
+                        $item->setCreated(new \DateTime($tweet->published));
+                        $item->setMessage(strip_tags($tweet->object->content));
+                        $item->setMessage_id($tweet->id);
+                        $item->setResult($result_model);
+                        $item->setSearch($this->search);
+                        $item->setMessageUrl($tweet->url);
 
-                    $result_model->addItem($item);
-                    $countInserts++;
+                        $result_model->addItem($item);
+                        $countInserts++;
+                    } catch (\Exception $e)
+                    {
+                        
+                    }
                 }
             }
         }
@@ -153,9 +159,10 @@ class GooglePlusModule implements SocialNetworkInterface
         $log->setResult($result_model);
         $log->setNotice('Items added: ' . $countInserts);
         $result_model->addLog($log);
-           
+
         $this->em->persist($result_model);
         $this->em->flush();
     }
+
 }
 
