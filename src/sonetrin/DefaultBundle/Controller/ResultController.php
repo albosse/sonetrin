@@ -25,7 +25,6 @@ class ResultController extends Controller
      */
     public function indexAction(Search $search, $filter)
     {
-
         $em = $this->getDoctrine()->getManager();
         $randomItems = $em->getRepository('sonetrinDefaultBundle:Item')->findAllItemsBySearch($search, $filter);
         $sentimentCount = $em->getRepository('sonetrinDefaultBundle:Result')->findRecordsSentiments($search->getId());

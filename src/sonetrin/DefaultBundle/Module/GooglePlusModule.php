@@ -61,7 +61,7 @@ class GooglePlusModule implements SocialNetworkInterface
         {
             $url = $this->socialNetwork->getUrl() . urlencode($query);
             $url .= '&lang=' . $this->search->getLanguage();
-//            $url .=  '&until=' . $until;
+            $url .= '&orderBy=recent';
             $url .= '&maxResults=' . $this->maxResults;
 
             if (isset($key))

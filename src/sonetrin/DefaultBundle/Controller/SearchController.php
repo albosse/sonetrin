@@ -259,7 +259,7 @@ class SearchController extends Controller
     }
 
     /**
-     * Search networks for the created query.
+     * Only for debugging
      *
      * @Route("/run/{id}", name="search_run", requirements={"id" = "\d+"})
      */
@@ -294,7 +294,7 @@ class SearchController extends Controller
      *
      * @Route("/run_ajax/{id}", name="search_runAjax", requirements={"id" = "\d+"})
      */
-    public function runAjaxAction($id)
+    public function startSearchAction($id)
     {    
         $em = $this->getDoctrine()->getManager();
         $search = $em->getRepository('sonetrinDefaultBundle:Search')->find($id);

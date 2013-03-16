@@ -56,7 +56,7 @@ class TwitterModule implements SocialNetworkInterface
             $url = $this->socialNetwork->getUrl() .
                     urlencode($query) .
                     '&lang=' . $this->search->getLanguage() .
-//                    '&until=' . $until .
+                    '&result_type=recent' .
                     '&rpp=' . $this->rpp .
                     '&page=' . $page;
 
