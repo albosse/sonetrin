@@ -21,7 +21,7 @@ class GooglePlusModule implements SocialNetworkInterface
     //array with date:user:text
     private $socialNetwork;
     private $maxResults = 20;
-    private $cycles = 20;
+    private $cycles = 50;
 
     public function __construct($em, Search $search)
     {
@@ -82,8 +82,15 @@ class GooglePlusModule implements SocialNetworkInterface
             $result = json_decode(curl_exec($ch));
 
             $this->results_raw[] = $result;
-
-            $nextPageToken = isset($result->nextPageToken) ? $result->nextPageToken : '';
+            
+            if(isset($result->nextPageToken))
+            {
+                $nextPageToken = $result->nextPageToken;
+            }
+            else
+            {
+                break;
+            }
         }
 
         $this->results_raw = array_values($this->results_raw);

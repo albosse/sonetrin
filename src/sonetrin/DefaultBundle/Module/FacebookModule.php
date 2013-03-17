@@ -22,7 +22,7 @@ class FacebookModule implements SocialNetworkInterface
     /** @var type SocialNetwork */
     private $socialNetwork;
     private $results_raw;
-    private $pages = 20;
+    private $pages = 50;
     private $accessToken;
 
     public function __construct($em, Search $search)
@@ -69,6 +69,8 @@ class FacebookModule implements SocialNetworkInterface
                 {
                     $url.= '&access_token=' . $this->accessToken;
                 }
+
+                $url .= '&locale=' . $this->search->getLanguage();
             }
 
             $ch = curl_init();
@@ -191,5 +193,4 @@ class FacebookModule implements SocialNetworkInterface
             return '';
         }
     }
-
 }
