@@ -289,6 +289,11 @@ class AnalysisController extends Controller
 
         $filename = 'Export.xlsx';
         $file_dir = 'export/' . $filename;
+        
+        if(!is_dir('export'))
+        {
+            mkdir('export');
+        }
         $objWriter->save($file_dir);
 
         $response = new Response();
