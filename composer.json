@@ -23,8 +23,8 @@
         "kriswallsmith/assetic": "1.1.*@dev",
         "toa/twitter-bootstrap-bundle": "2.1.x-dev",
         "gedmo/doctrine-extensions": "2.3.x-dev",
-        "basecom/wrapper-bundle": "dev-master",
-        "basecom/cronjob-bundle": "dev-master",
+        "basecom/wrapper-bundle": "1.0.1",
+        "basecom/cronjob-bundle": "1.2.0",
         "phpexcel/phpexcel": "dev-master"
     },
     "scripts": {
